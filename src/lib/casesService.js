@@ -1,5 +1,16 @@
 import { supabase } from './supabase'
 
+const caseImages = import.meta.glob('/src/assets/images/*_case.webp', {
+  eager: true,
+  query: '?url',
+  import: 'default'
+})
+
+export function resolveCaseImage(path) {
+  if (!path) return ''
+  return caseImages[path] || path
+}
+
 export const casesService = {
   async getAll() {
     const { data, error } = await supabase

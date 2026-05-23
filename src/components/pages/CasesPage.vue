@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { supabase } from '@/lib/supabase';
+import { resolveCaseImage } from '@/lib/casesService';
 import graphicImage from '@/assets/images/graphic.webp?url';
 
 const filters = [
@@ -100,7 +101,7 @@ const filteredCases = computed(() => {
         >
           <!-- Image -->
           <img 
-            :src="caseItem.image"
+            :src="resolveCaseImage(caseItem.image)"
             :alt="caseItem.title" 
             class="case-image"
             width="400"

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import { casesService } from '@/lib/casesService'
+import { casesService, resolveCaseImage } from '@/lib/casesService'
 import { reviewsService } from '@/lib/reviewsService'
 import heroImage from '@/assets/images/cube.webp?url';
 import createSiteIcon from '@/assets/icons/create_site.svg?url';
@@ -251,7 +251,7 @@ async function submitForm() {
           class="case-card"
         >
           <!-- Image -->
-          <img :src="caseItem.image" :alt="caseItem.title" class="case-image" loading="lazy" width="400" height="280" />
+           <img :src="resolveCaseImage(caseItem.image)" :alt="caseItem.title" class="case-image" loading="lazy" width="400" height="280" />
 
           <!-- Content -->
           <div class="case-content">

@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '@/lib/supabase'
+import { resolveCaseImage } from '@/lib/casesService'
 
 const route = useRoute()
 const currentCase = ref(null)
@@ -56,7 +57,7 @@ const categoryLabel = computed(() => {
         </div>
       </div>
 
-      <img :src="currentCase.image" :alt="currentCase.title" class="case-detail-image" width="800" height="500" />
+      <img :src="resolveCaseImage(currentCase.image)" :alt="currentCase.title" class="case-detail-image" width="800" height="500" />
     </section>
 
     <!-- Tags -->
