@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://greencode.studio/sitemap.xml
+
+Host: https://greencode.studio
