@@ -55,7 +55,17 @@ input, textarea {
 }
 
 img {
+  max-width: 100%;
+  height: auto;
+}
+
+img:not(.hero-image):not(.hero-image-placeholder):not(.case-detail-image) {
   animation: imageFadeIn 0.5s ease-out;
+}
+
+.hero-image-placeholder {
+  max-width: 100%;
+  height: auto;
 }
 
 @keyframes imageFadeIn {

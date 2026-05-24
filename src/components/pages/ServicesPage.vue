@@ -122,7 +122,7 @@ const closeModal = () => {
 
         <!-- Right Column - Hero Image Placeholder -->
         <div class="hero-right">
-          <img :src="mozaikaImage" alt="Mozaika" class="hero-image-placeholder" />
+          <img v-fade-in :src="mozaikaImage" alt="Mozaika" class="hero-image-placeholder" />
         </div>
       </div>
     </section>

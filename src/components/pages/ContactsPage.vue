@@ -90,7 +90,7 @@ async function submitForm() {
 
         <!-- Right Column - Hero Image -->
         <div class="hero-right">
-          <img :src="contactsImage" alt="Greencode Contacts" class="hero-image" width="700" height="400" />
+          <img v-fade-in :src="contactsImage" alt="Greencode Contacts" class="hero-image" width="700" height="400" />
         </div>
       </div>
     </section>

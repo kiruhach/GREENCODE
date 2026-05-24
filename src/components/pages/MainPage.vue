@@ -192,7 +192,7 @@ async function submitForm() {
 
         <!-- Right Column - Hero Image Placeholder -->
         <div class="hero-right">
-          <img :src="heroImage" alt="Greencode" class="hero-image" width="700" height="400" />
+          <img v-fade-in :src="heroImage" alt="Greencode" class="hero-image" width="700" height="400" />
         </div>
       </div>
     </section>
@@ -404,12 +404,19 @@ async function submitForm() {
 spline-viewer {
   position: fixed;
   top: 0;
-  left: 500px;
+  left: min(500px, 30vw);
   width: 100%;
   height: 100%;
   z-index: -1;
   pointer-events: none;
   opacity: 0.9;
+}
+
+@media (max-width: 767px) {
+  spline-viewer {
+    left: 20vw;
+    opacity: 0.5;
+  }
 }
 
 .hero-section {
@@ -456,7 +463,7 @@ spline-viewer {
 
 .hero-title {
   color: #004524;
-  font-size: 72px;
+  font-size: 48px;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: bold;
   line-height: 1.1;
@@ -477,26 +484,42 @@ spline-viewer {
 
 .hero-description {
   color: #004524;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
-  line-height: 1.95;
+  line-height: 1.7;
   margin-bottom: 40px;
+}
+
+@media (min-width: 768px) {
+  .hero-description {
+    font-size: 20px;
+    line-height: 1.95;
+  }
 }
 
 .cta-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 261px;
-  height: 65px;
+  width: 100%;
+  max-width: 261px;
+  height: 56px;
   background-color: #44944A;
   box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
   border-radius: 20px;
   color: white;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   text-decoration: none;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .cta-button {
+    width: 261px;
+    height: 65px;
+    font-size: 20px;
+  }
 }
 
 .cta-button:hover {
@@ -526,7 +549,13 @@ spline-viewer {
 .services-section, .cases-section, .reviews-section, .contacts-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 80px 24px;
+  padding: 48px 16px;
+}
+
+@media (min-width: 768px) {
+  .services-section, .cases-section, .reviews-section, .contacts-section {
+    padding: 80px 24px;
+  }
 }
 
 .section-label {
@@ -541,16 +570,17 @@ spline-viewer {
 
 .section-title {
   color: #004524;
-  font-size: 48px;
+  font-size: 32px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.15;
-  margin-bottom: 64px;
+  margin-bottom: 40px;
 }
 
 @media (min-width: 768px) {
   .section-title {
     font-size: 72px;
+    margin-bottom: 64px;
   }
 }
 
@@ -578,10 +608,16 @@ spline-viewer {
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 30px;
-  padding: 32px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
   transition: all 0.3s;
   cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .service-card {
+    padding: 32px;
+  }
 }
 
 .service-learn-more {
@@ -637,16 +673,29 @@ spline-viewer {
 
 .service-title {
   color: white;
-  font-size: 30px;
+  font-size: 22px;
   font-family: 'Roboto Mono', monospace;
   margin-bottom: 12px;
 }
 
+@media (min-width: 768px) {
+  .service-title {
+    font-size: 30px;
+  }
+}
+
 .service-description {
   color: rgba(255, 255, 255, 0.72);
-  font-size: 18px;
+  font-size: 15px;
   font-family: 'Roboto Mono', monospace;
-  line-height: 2;
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .service-description {
+    font-size: 18px;
+    line-height: 2;
+  }
 }
 
 .cases-grid {
@@ -687,11 +736,20 @@ spline-viewer {
 }
 
 .case-image {
-  width: calc(100% - 48px);
-  height: 280px;
+  width: calc(100% - 32px);
+  height: 200px;
   object-fit: cover;
-  margin: 24px;
-  border-radius: 26px;
+  margin: 16px;
+  border-radius: 20px;
+}
+
+@media (min-width: 768px) {
+  .case-image {
+    width: calc(100% - 48px);
+    height: 280px;
+    margin: 24px;
+    border-radius: 26px;
+  }
 }
 
 .case-card:hover .case-image {
@@ -720,17 +778,30 @@ spline-viewer {
 
 .case-title {
   color: white;
-  font-size: 30px;
+  font-size: 22px;
   font-family: 'Roboto Mono', monospace;
   margin-bottom: 12px;
 }
 
+@media (min-width: 768px) {
+  .case-title {
+    font-size: 30px;
+  }
+}
+
 .case-description {
   color: rgba(255, 255, 255, 0.72);
-  font-size: 18px;
+  font-size: 15px;
   font-family: 'Roboto Mono', monospace;
-  line-height: 2;
+  line-height: 1.6;
   margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .case-description {
+    font-size: 18px;
+    line-height: 2;
+  }
 }
 
 .view-all-wrapper {
@@ -742,16 +813,25 @@ spline-viewer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 276px;
-  height: 72px;
+  width: 100%;
+  max-width: 276px;
+  height: 56px;
   background-color: white;
   border-radius: 20px;
   color: black;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .view-all-button {
+    width: 276px;
+    height: 72px;
+    font-size: 20px;
+  }
 }
 
 .view-all-button:hover {
@@ -782,10 +862,18 @@ spline-viewer {
 
 .review-text {
   color: white;
-  font-size: 24px;
+  font-size: 18px;
   font-family: 'Roboto Mono', monospace;
-  line-height: 2.5;
-  margin-bottom: 32px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .review-text {
+    font-size: 24px;
+    line-height: 2.5;
+    margin-bottom: 32px;
+  }
 }
 
 .review-author {
@@ -843,15 +931,22 @@ spline-viewer {
 .contact-card {
   background-color: #004524;
   border-radius: 16px;
-  padding: 24px;
+  padding: 20px;
   width: 100%;
   max-width: 552px;
-  min-height: 310px;
+  min-height: auto;
   box-sizing: border-box;
   margin-bottom: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+@media (min-width: 768px) {
+  .contact-card {
+    padding: 24px;
+    min-height: 310px;
+  }
 }
 
 .contact-card:last-child {
@@ -869,9 +964,15 @@ spline-viewer {
 
 .contact-value {
   color: white;
-  font-size: 30px;
+  font-size: 22px;
   font-family: 'Space Grotesk', sans-serif;
   text-align: right;
+}
+
+@media (min-width: 768px) {
+  .contact-value {
+    font-size: 30px;
+  }
 }
 
 .form-section .section-title {
@@ -882,8 +983,14 @@ spline-viewer {
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 36px;
-  padding: 40px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+@media (min-width: 768px) {
+  .form-card {
+    padding: 40px;
+  }
 }
 
 .form-sections {
@@ -988,17 +1095,26 @@ spline-viewer {
 }
 
 .submit-button {
-  width: 273px;
-  height: 70px;
+  width: 100%;
+  max-width: 273px;
+  height: 56px;
   background-color: #44944A;
   box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
   border-radius: 20px;
   color: white;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   border: none;
   cursor: pointer;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .submit-button {
+    width: 273px;
+    height: 70px;
+    font-size: 20px;
+  }
 }
 
 .submit-button:hover {
@@ -1016,6 +1132,11 @@ spline-viewer {
 
 .form-title {
   text-align: right;
-  margin-right: 535px;
+}
+
+@media (min-width: 1280px) {
+  .form-title {
+    margin-right: 535px;
+  }
 }
 </style>

@@ -67,7 +67,7 @@ const filteredCases = computed(() => {
 
         <!-- Right Column - Hero Image -->
         <div class="hero-right">
-          <img :src="graphicImage" alt="Graphic" class="hero-image-placeholder" />
+          <img v-fade-in :src="graphicImage" alt="Graphic" class="hero-image-placeholder" />
         </div>
       </div>
     </section>

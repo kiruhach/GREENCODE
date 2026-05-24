@@ -57,7 +57,7 @@ const categoryLabel = computed(() => {
         </div>
       </div>
 
-      <img :src="resolveCaseImage(currentCase.image)" :alt="currentCase.title" class="case-detail-image" width="800" height="500" />
+      <img v-fade-in :src="resolveCaseImage(currentCase.image)" :alt="currentCase.title" class="case-detail-image" width="800" height="500" />
     </section>
 
     <!-- Tags -->

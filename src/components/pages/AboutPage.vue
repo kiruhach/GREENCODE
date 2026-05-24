@@ -65,7 +65,7 @@ const reasons = [
 
         <!-- Right Column - Hero Image Placeholder -->
         <div class="hero-right">
-          <img :src="teamImage" alt="Team" class="hero-image-placeholder" />
+          <img v-fade-in :src="teamImage" alt="Team" class="hero-image-placeholder" />
         </div>
       </div>
     </section>
@@ -201,11 +201,17 @@ const reasons = [
 
 .hero-title {
   color: #004524;
-  font-size: 48px;
+  font-size: 32px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.1;
   margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 72px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -224,16 +230,25 @@ const reasons = [
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 261px;
-  height: 65px;
+  width: 100%;
+  max-width: 261px;
+  height: 56px;
   background-color: #44944A;
   box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
   border-radius: 20px;
   color: white;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   text-decoration: none;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .cta-button {
+    width: 261px;
+    height: 65px;
+    font-size: 20px;
+  }
 }
 
 .cta-button:hover {
@@ -253,13 +268,22 @@ const reasons = [
 }
 
 .hero-image-placeholder {
-  width: 800px;
-  height: 462px;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  aspect-ratio: 800 / 462;
   border-radius: 40px;
   object-fit: cover;
   margin-left: auto;
   margin-top: 150px;
   display: block;
+}
+
+@media (max-width: 767px) {
+  .hero-image-placeholder {
+    margin-top: 40px;
+    aspect-ratio: 800 / 462;
+  }
 }
 
 .cards-section {
