@@ -15,6 +15,21 @@ export const reviewsService = {
     return data
   },
 
+  async getById(id) {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      console.error('Error fetching review:', error)
+      return null
+    }
+
+    return data
+  },
+
   async getLatest(limit = 2) {
     const { data, error } = await supabase
       .from('reviews')
@@ -42,5 +57,35 @@ export const reviewsService = {
     }
 
     return data
+  },
+
+  async update(id, review) {
+    const { data, error } = await supabase
+      .from('reviews')
+      .update(review)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating review:', error)
+      return null
+    }
+
+    return data
+  },
+
+  async remove(id) {
+    const { error } = await supabase
+      .from('reviews')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting review:', error)
+      return false
+    }
+
+    return true
   }
 }

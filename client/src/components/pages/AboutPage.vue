@@ -1,5 +1,5 @@
 <script setup>
-import teamImage from '@/assets/images/team.webp?url';
+import aboutBg from '@/assets/images/about.webp?url';
 
 const mainCards = [
   {
@@ -43,7 +43,7 @@ const reasons = [
 <template>
   <div class="about-page">
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" :style="{ backgroundImage: `url(${aboutBg})` }">
       <div class="hero-grid">
         <!-- Left Column -->
         <div class="hero-left">
@@ -63,10 +63,6 @@ const reasons = [
           </router-link>
         </div>
 
-        <!-- Right Column - Hero Image Placeholder -->
-        <div class="hero-right">
-          <img v-fade-in :src="teamImage" alt="Team" class="hero-image-placeholder" />
-        </div>
       </div>
     </section>
 
@@ -160,13 +156,16 @@ const reasons = [
 
 <style scoped>
 .about-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
   padding: 32px 24px 64px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .hero-grid {

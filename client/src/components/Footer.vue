@@ -10,7 +10,7 @@ import vkIcon from '@/assets/icons/VK.svg?url'
       <div class="footer-grid">
         <!-- Logo & Copyright -->
         <div class="footer-logo">
-          <img :src="logoIcon" alt="Greencode" class="footer-logo-img" width="120" height="28" />
+          <img :src="logoIcon" alt="Greencode" class="footer-logo-img" width="120" height="28" loading="lazy" />
           <span class="logo-copyright">© 2026</span>
         </div>
 
@@ -38,10 +38,10 @@ import vkIcon from '@/assets/icons/VK.svg?url'
           <p class="footer-desc">Digital-агентство полного цикла. Создаём сайты, которые работают на ваш бизнес.</p>
           <div class="social-links">
             <a href="#" class="social-icon">
-              <img :src="telegramIcon" alt="Telegram" class="social-svg" />
+              <img :src="telegramIcon" alt="Telegram" class="social-svg" loading="lazy" />
             </a>
             <a href="#" class="social-icon">
-              <img :src="vkIcon" alt="VK" class="social-svg" />
+              <img :src="vkIcon" alt="VK" class="social-svg" loading="lazy" />
             </a>
           </div>
         </div>

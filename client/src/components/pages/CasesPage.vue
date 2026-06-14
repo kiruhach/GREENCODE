@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { supabase } from '@/lib/supabase';
 import { resolveCaseImage } from '@/lib/casesService';
-import graphicImage from '@/assets/images/graphic.webp?url';
+import casesBg from '@/assets/images/cases.webp?url';
 
 const filters = [
   { id: 'all', label: 'Все кейсы' },
@@ -19,7 +19,33 @@ const loading = ref(true)
 
 onMounted(async () => {
   await fetchCases()
+  await nextTick()
+  observeCases()
 })
+
+let caseObserver = null
+
+function observeCases() {
+  if (caseObserver) caseObserver.disconnect()
+
+  caseObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('case-visible')
+        caseObserver.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' })
+
+  document.querySelectorAll('.case-card').forEach((el) => {
+    caseObserver.observe(el)
+    if (!el.classList.contains('case-animated')) {
+      el.addEventListener('animationend', () => {
+        el.classList.add('case-animated')
+      }, { once: true })
+    }
+  })
+}
 
 async function fetchCases() {
   loading.value = true
@@ -40,12 +66,16 @@ const filteredCases = computed(() => {
   }
   return cases.value.filter(c => c.category === activeFilter.value)
 })
+
+watch(filteredCases, () => {
+  nextTick(() => observeCases())
+})
 </script>
 
 <template>
   <div class="cases-page">
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" :style="{ backgroundImage: `url(${casesBg})` }">
       <div class="hero-grid">
         <!-- Left Column -->
         <div class="hero-left">
@@ -65,10 +95,6 @@ const filteredCases = computed(() => {
           </router-link>
         </div>
 
-        <!-- Right Column - Hero Image -->
-        <div class="hero-right">
-          <img v-fade-in :src="graphicImage" alt="Graphic" class="hero-image-placeholder" />
-        </div>
       </div>
     </section>
 
@@ -128,13 +154,23 @@ const filteredCases = computed(() => {
 
 <style scoped>
 .cases-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
   padding: 32px 24px 48px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 800px;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    min-height: 900px;
+  }
 }
 
 .hero-grid {
@@ -280,20 +316,50 @@ const filteredCases = computed(() => {
   }
 }
 
+@keyframes caseFadeIn {
+  0% { opacity: 0; transform: translateY(60px) scale(0.92); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes casePulse {
+  0%, 100% { border-color: rgba(68, 148, 74, 0.2); }
+  50% { border-color: rgba(68, 148, 74, 0.4); }
+}
+
+@keyframes caseGlow {
+  0%, 100% { box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10); }
+  50% { box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.05) inset, 0px 0px 40px rgba(0, 255, 102, 0.18); }
+}
+
 .case-card {
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 32px;
   overflow: hidden;
   border: 1px solid rgba(68, 148, 74, 0.2);
-  transition: border-color 0.3s, transform 0.3s;
+  transition: border-color 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s ease;
   cursor: pointer;
   will-change: transform;
 }
 
+.case-card.case-visible {
+  animation: caseFadeIn 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.case-card.case-animated {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: casePulse 3s ease-in-out infinite, caseGlow 4s ease-in-out infinite;
+}
+
+.case-card.case-animated:hover {
+  animation: none !important;
+}
+
 .case-card:hover {
-  border-color: rgba(68, 148, 74, 0.5);
-  transform: translateY(-4px);
+  border-color: rgba(68, 148, 74, 0.6);
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.06) inset, 0px 20px 40px rgba(0, 0, 0, 0.2), 0px 0px 34px rgba(0, 255, 102, 0.15);
 }
 
 .case-image {
@@ -302,9 +368,11 @@ const filteredCases = computed(() => {
   object-fit: cover;
   margin: 24px 24px 0 24px;
   border-radius: 28px 28px 0 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 .case-card:hover .case-image {
+  transform: scale(1.04);
   opacity: 0.9;
 }
 

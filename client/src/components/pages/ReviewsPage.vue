@@ -149,7 +149,7 @@ const submitReview = async () => {
 
 <style scoped>
 .reviews-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {

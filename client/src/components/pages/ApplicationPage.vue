@@ -210,7 +210,7 @@ async function submitForm() {
               :class="{ 'service-tag--selected': selectedServices.includes(service) }"
               @click="toggleService(service)"
             >
-              <img v-if="selectedServices.includes(service)" :src="checkMarkIcon" alt="check" class="service-check" />
+              <img v-if="selectedServices.includes(service)" :src="checkMarkIcon" alt="check" class="service-check" loading="lazy" />
               <span class="service-text">{{ service }}</span>
             </div>
           </div>
@@ -285,7 +285,7 @@ async function submitForm() {
 
 <style scoped>
 .application-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {

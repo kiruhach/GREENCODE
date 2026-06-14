@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
-import contactsImage from '@/assets/images/contacts.webp?url'
+import contactBg from '@/assets/images/contact.webp?url'
 
 const email = ref('')
 const phone = ref('')
@@ -76,7 +76,7 @@ async function submitForm() {
 <template>
   <div class="contacts-page">
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" :style="{ backgroundImage: `url(${contactBg})` }">
       <div class="hero-grid">
         <!-- Left Column -->
         <div class="hero-left">
@@ -88,10 +88,6 @@ async function submitForm() {
           </h1>
         </div>
 
-        <!-- Right Column - Hero Image -->
-        <div class="hero-right">
-          <img v-fade-in :src="contactsImage" alt="Greencode Contacts" class="hero-image" width="700" height="400" />
-        </div>
       </div>
     </section>
 
@@ -203,13 +199,23 @@ async function submitForm() {
 
 <style scoped>
 .contacts-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
   padding: 32px 24px 64px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 800px;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    min-height: 900px;
+  }
 }
 
 .hero-grid {

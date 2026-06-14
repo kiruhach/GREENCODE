@@ -57,7 +57,7 @@ const categoryLabel = computed(() => {
         </div>
       </div>
 
-      <img v-fade-in :src="resolveCaseImage(currentCase.image)" :alt="currentCase.title" class="case-detail-image" width="800" height="500" />
+      <img v-fade-in :src="resolveCaseImage(currentCase.image)" :alt="currentCase.title" class="case-detail-image" width="800" height="500" loading="lazy" />
     </section>
 
     <!-- Tags -->
@@ -112,7 +112,7 @@ const categoryLabel = computed(() => {
 
 <style scoped>
 .case-detail-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {
@@ -324,6 +324,7 @@ const categoryLabel = computed(() => {
 }
 
 .loading {
+  flex: 1;
   text-align: center;
   padding: 100px 24px;
   color: #004524;
@@ -332,6 +333,7 @@ const categoryLabel = computed(() => {
 }
 
 .not-found {
+  flex: 1;
   text-align: center;
   padding: 100px 24px;
 }

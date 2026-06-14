@@ -17,7 +17,7 @@ const navItems = [
     <div class="header-inner">
       <!-- Logo -->
       <router-link to="/" class="logo-link">
-        <img :src="logoIcon" alt="Greencode" class="logo-img" />
+        <img :src="logoIcon" alt="Greencode" class="logo-img" loading="lazy" />
       </router-link>
 
       <!-- Navigation -->

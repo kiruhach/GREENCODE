@@ -1,89 +1,34 @@
 <script setup>
-import { ref } from 'vue'
-import createSiteIcon from '@/assets/icons/create_site.svg?url';
-import seoUpIcon from '@/assets/icons/seo_up.svg?url';
-import designIcon from '@/assets/icons/design.svg?url';
-import brandingIcon from '@/assets/icons/branding.svg?url';
-import contentMarketingIcon from '@/assets/icons/content_marketing.svg?url';
-import webAnalyticsIcon from '@/assets/icons/web_analytics.svg?url';
-import mozaikaImage from '@/assets/images/mozaika.webp?url';
+import { ref, computed, onMounted } from 'vue'
+import { servicesService, resolveServiceIcon } from '@/lib/servicesService'
+import servicesBg from '@/assets/images/services.webp?url';
 
+const services = ref([])
+const detailsMap = ref({})
 const selectedTag = ref(null)
-const isModalOpen = ref(false)
-
-const subItemDescriptions = {
-  'Корпоративные сайты': 'Полнофункциональные сайты компаний с презентацией услуг, команды, контактов и экспертизы. Включают смысловые страницы, каталог услуг, форму заявки и интеграции.',
-  'Интернет-магазины': 'Полноценные магазины с каталогом товаров, корзиной, оформлением заказов, личным кабинетом и интеграциями с платёжными системами и 1С.',
-  'Landing Page': 'Посадочные страницы для конкретных целей: продажа товара, сбор заявок, регистрация на мероприятие. С фокусом на конверсию.',
-  'Техническая оптимизация': 'Ускорение загрузки, оптимизация кода, настройка кэширования, исправление ошибок и улучшение технических показателей.',
-  'SEO-аудит': 'Комплексный анализ сайта: техническое состояние, контент, структура, конкуренты. Выявляем проблемы и возможности роста.',
-  'Внутренняя оптимизация': 'Работа с контентом, структурой, мета-тегами, внутренними ссылками. Настройка ЧПУ, карт сайта, Robots.txt.',
-  'Внешняя оптимизация': 'Наращивание качественной ссылочной массы, работа с репутацией, размещение на тематических площадках.',
-  'Генеративная оптимизация': 'Подготовка сайта к появлению в AI-поиске и голосовых системах. Структурированные данные и оптимизация под LLM.',
-  'UI/UX дизайн': 'Проектирование визуально привлекательных и удобных интерфейсов с учётом поведения пользователей и целей бизнеса.',
-  'Прототипирование': 'Создание макетов страниц и интерактивных прототипов для согласования структуры до начала дизайна.',
-  'Дизайн-системы': 'Разработка единой системы компонентов, стилей и правил для масштабирования дизайна на большой проект.',
-  'Адаптивные интерфейсы': 'Верстка корректно работающая на всех устройствах: десктоп, планшет, мобильный телефон.',
-  'Смысловая платформа': 'Разработка основных смыслов бренда: миссия, ценности, позиционирование, УТП.',
-  'Визуальный код': 'Создание цветовой палитры, типографики, иконок и графических элементов бренда.',
-  'Голос бренда': 'Определение тона и стиля коммуникации бренда: как говорить с аудиторией.',
-  'Правила работы со стилем': 'Брендбук и гайдлайны по использованию фирменного стиля во всех каналах.',
-  'Контент-стратегия': 'Планирование контента для достижения бизнес-целей: воронка, типы контента, каналы.',
-  'SEO-статьи': 'Написание экспертных оптимизированных статей для привлечения органического трафика.',
-  'Тексты для сайта': 'Создание продающих текстов для главной, страниц услуг, карточек товаров.',
-  'Контент-планы': 'Редакционный календарь с планированием публикаций по сезонам и целям.',
-  'Настройка целей и событий': 'Подключение систем аналитики для отслеживания действий пользователей.',
-  'Панели показателей': 'Визуализация ключевых метрик в удобных дашбордах для принятия решений.',
-  'Отчётность': 'Регулярные отчёты о результатах продвижения и рекомендации по улучшению.',
-  'Метрики улучшения результатов': 'Анализ данных и поиск точек роста для увеличения эффективности.'
-}
-
-const services = [
-  {
-    iconSrc: createSiteIcon,
-    title: 'Разработка сайтов',
-    description: 'Корпоративные сайты, интернет-магазины и Landing Page, где производительность, структура и визуальный стиль работают на результат.',
-    subItems: ['Корпоративные сайты', 'Интернет-магазины', 'Landing Page', 'Техническая оптимизация'],
-    category: 'Разработка сайтов'
-  },
-  {
-    iconSrc: seoUpIcon,
-    title: 'SEO-продвижение',
-    description: 'Делаем SEO частью продукта с первого дня: от аудита до внутренней и внешней оптимизации, включая генеративный поиск.',
-    subItems: ['SEO-аудит', 'Внутренняя оптимизация', 'Внешняя оптимизация', 'Генеративная оптимизация'],
-    category: 'SEO-продвижение'
-  },
-  {
-    iconSrc: designIcon,
-    title: 'Веб-дизайн',
-    description: 'Проектируем интерфейсы с фокусом на пользовательский сценарий, визуальный ритм и конверсию.',
-    subItems: ['UI/UX дизайн', 'Прототипирование', 'Дизайн-системы', 'Адаптивные интерфейсы'],
-    category: 'Веб-дизайн'
-  },
-  {
-    iconSrc: brandingIcon,
-    title: 'Брендинг',
-    description: 'Создаём айдентику, которая делает бизнес узнаваемым и помогает держать единый тон во всех цифровых точках.',
-    subItems: ['Смысловая платформа', 'Визуальный код', 'Голос бренда', 'Правила работы со стилем'],
-    category: 'Брендинг'
-  },
-  {
-    iconSrc: contentMarketingIcon,
-    title: 'Контент-маркетинг',
-    description: 'Помогаем бренду говорить убедительно: через контент-стратегию, SEO-материалы и тексты для воронки продаж.',
-    subItems: ['Контент-стратегия', 'SEO-статьи', 'Тексты для сайта', 'Контент-планы'],
-    category: 'Контент-маркетинг'
-  },
-  {
-    iconSrc: webAnalyticsIcon,
-    title: 'Веб-аналитика',
-    description: 'Настраиваем аналитическую основу: дашборды, события, отчёты и контроль за воронкой.',
-    subItems: ['Настройка целей и событий', 'Панели показателей', 'Отчётность', 'Метрики улучшения результатов'],
-    category: 'Веб-аналитика'
-  }
-]
-
 const selectedCategory = ref('')
+const isModalOpen = ref(false)
+const loading = ref(true)
+
+onMounted(async () => {
+  const [servicesData, detailsData] = await Promise.all([
+    servicesService.getAll(),
+    servicesService.getAllDetails()
+  ])
+
+  if (servicesData) {
+    services.value = servicesData
+  }
+
+  if (detailsData) {
+    detailsMap.value = {}
+    detailsData.forEach(d => {
+      detailsMap.value[d.sub_item] = d.description
+    })
+  }
+
+  loading.value = false
+})
 
 const openTagModal = (tag, category) => {
   selectedCategory.value = category
@@ -100,7 +45,7 @@ const closeModal = () => {
 <template>
   <div class="services-page">
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" :style="{ backgroundImage: `url(${servicesBg})` }">
       <div class="hero-grid">
         <!-- Left Column -->
         <div class="hero-left">
@@ -120,19 +65,16 @@ const closeModal = () => {
           </router-link>
         </div>
 
-        <!-- Right Column - Hero Image Placeholder -->
-        <div class="hero-right">
-          <img v-fade-in :src="mozaikaImage" alt="Mozaika" class="hero-image-placeholder" />
-        </div>
       </div>
     </section>
 
     <!-- Services Grid -->
     <section class="services-section">
-      <div class="services-grid">
+      <div v-if="loading" class="loading">Загрузка...</div>
+      <div v-else class="services-grid">
         <div 
-          v-for="(service, index) in services" 
-          :key="index"
+          v-for="service in services" 
+          :key="service.id"
           class="service-card"
         >
           <div class="service-content">
@@ -140,7 +82,7 @@ const closeModal = () => {
             <div class="service-main">
               <!-- Icon -->
               <div class="service-icon">
-                <img :src="service.iconSrc" :alt="service.title" />
+                <img :src="resolveServiceIcon(service.icon)" :alt="service.title" loading="lazy" />
               </div>
 
               <!-- Title -->
@@ -152,7 +94,7 @@ const closeModal = () => {
               <!-- Sub Items Grid -->
               <div class="sub-items-grid">
                 <div 
-                  v-for="(subItem, subIndex) in service.subItems" 
+                  v-for="(subItem, subIndex) in service.sub_items" 
                   :key="subIndex"
                   class="sub-item"
                   @click="openTagModal(subItem, service.category)"
@@ -180,7 +122,7 @@ const closeModal = () => {
               </button>
               <div class="drawer-category">{{ selectedCategory }}</div>
               <h3 class="drawer-title">{{ selectedTag }}</h3>
-              <p class="drawer-description">{{ subItemDescriptions[selectedTag] }}</p>
+              <p class="drawer-description">{{ detailsMap[selectedTag] }}</p>
               <router-link to="/application" class="drawer-cta" @click="closeModal">
                 Обсудить проект
               </router-link>
@@ -194,13 +136,23 @@ const closeModal = () => {
 
 <style scoped>
 .services-page {
-  min-height: 100vh;
+  flex: 1;
 }
 
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
   padding: 32px 24px 80px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 800px;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    min-height: 900px;
+  }
 }
 
 .hero-grid {
@@ -498,6 +450,14 @@ const closeModal = () => {
 .drawer-panel-enter-from,
 .drawer-panel-leave-to {
   transform: translateX(100%);
+}
+
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: #004524;
+  font-size: 18px;
+  font-family: 'Roboto Mono', monospace;
 }
 
 @media (max-width: 768px) {

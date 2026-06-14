@@ -53,5 +53,50 @@ export const casesService = {
     }
 
     return data
+  },
+
+  async create(caseData) {
+    const { data, error } = await supabase
+      .from('cases')
+      .insert(caseData)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating case:', error)
+      return null
+    }
+
+    return data
+  },
+
+  async update(id, caseData) {
+    const { data, error } = await supabase
+      .from('cases')
+      .update(caseData)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating case:', error)
+      return null
+    }
+
+    return data
+  },
+
+  async remove(id) {
+    const { error } = await supabase
+      .from('cases')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting case:', error)
+      return false
+    }
+
+    return true
   }
 }

@@ -1,17 +1,18 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { casesService, resolveCaseImage } from '@/lib/casesService'
 import { reviewsService } from '@/lib/reviewsService'
-import heroImage from '@/assets/images/cube.webp?url';
+import heroBg from '@/assets/images/hero.webp?url';
 import createSiteIcon from '@/assets/icons/create_site.svg?url';
 import seoUpIcon from '@/assets/icons/seo_up.svg?url';
 import designIcon from '@/assets/icons/design.svg?url';
 import brandingIcon from '@/assets/icons/branding.svg?url';
 import contentMarketingIcon from '@/assets/icons/content_marketing.svg?url';
 import webAnalyticsIcon from '@/assets/icons/web_analytics.svg?url';
+import greencodeVideo from '@/assets/videos/greencode_video.webm?url';
 
-onMounted(() => {
+onMounted(async () => {
   const script = document.createElement('script')
   script.type = 'module'
   script.src = 'https://unpkg.com/@splinetool/viewer@1.12.94/build/spline-viewer.js'
@@ -28,9 +29,32 @@ onMounted(() => {
     }
   }, 500)
 
-  fetchCases()
-  fetchReviews()
+  await Promise.all([fetchCases(), fetchReviews()])
+  await nextTick()
+  observeCases()
 })
+
+let caseObserver = null
+
+function observeCases() {
+  if (caseObserver) caseObserver.disconnect()
+
+  caseObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('case-visible')
+        caseObserver.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' })
+
+  document.querySelectorAll('.case-card').forEach((el) => {
+    caseObserver.observe(el)
+    el.addEventListener('animationend', () => {
+      el.classList.add('case-animated')
+    }, { once: true })
+  })
+}
 
 const cases = ref([])
 const loadingCases = ref(true)
@@ -159,7 +183,7 @@ async function submitForm() {
     <spline-viewer url="https://prod.spline.design/fcVRjDk4PZ0xx9Iw/scene.splinecode"></spline-viewer>
 
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" :style="{ backgroundImage: `url(${heroBg})` }">
       <div class="hero-grid">
         <!-- Left Column -->
         <div class="hero-left">
@@ -188,11 +212,6 @@ async function submitForm() {
           >
             Оставить заявку
           </router-link>
-        </div>
-
-        <!-- Right Column - Hero Image Placeholder -->
-        <div class="hero-right">
-          <img v-fade-in :src="heroImage" alt="Greencode" class="hero-image" width="700" height="400" />
         </div>
       </div>
     </section>
@@ -233,6 +252,18 @@ async function submitForm() {
           </div>
         </router-link>
       </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section">
+      <video
+        class="greencode-video"
+        :src="greencodeVideo"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
     </section>
 
     <!-- Cases Section -->
@@ -397,7 +428,7 @@ async function submitForm() {
 
 <style scoped>
 .main-page {
-  min-height: 100vh;
+  flex: 1;
   position: relative;
 }
 
@@ -422,19 +453,17 @@ spline-viewer {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 32px 0 120px 24px;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  border-radius: 40px;
 }
 
 .hero-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 32px;
-}
-
-@media (min-width: 1280px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 .badge {
@@ -484,15 +513,16 @@ spline-viewer {
 
 .hero-description {
   color: #004524;
-  font-size: 16px;
+  font-size: 18px;
   font-family: 'Roboto Mono', monospace;
   line-height: 1.7;
   margin-bottom: 40px;
+  max-width: 720px;
 }
 
 @media (min-width: 768px) {
   .hero-description {
-    font-size: 20px;
+    font-size: 24px;
     line-height: 1.95;
   }
 }
@@ -527,34 +557,33 @@ spline-viewer {
   transform: scale(1.02);
 }
 
-.hero-right {
-  display: none;
-}
-
-@media (min-width: 1280px) {
-  .hero-right {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-
-.hero-image {
-  width: 100%;
-  max-width: 800px;
-  height: auto;
-  border-radius: 40px;
-  object-fit: cover;
-}
-
 .services-section, .cases-section, .reviews-section, .contacts-section {
   max-width: 1920px;
   margin: 0 auto;
   padding: 48px 16px;
 }
 
+.video-section {
+  width: 100%;
+  overflow: hidden;
+}
+
+.greencode-video {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
 @media (min-width: 768px) {
-  .services-section, .cases-section, .reviews-section, .contacts-section {
-    padding: 80px 24px;
+  .greencode-video {
+    height: 250px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .greencode-video {
+    height: 300px;
   }
 }
 
@@ -717,6 +746,21 @@ spline-viewer {
   }
 }
 
+@keyframes caseFadeIn {
+  0% { opacity: 0; transform: translateY(60px) scale(0.92); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes casePulse {
+  0%, 100% { border-color: rgba(68, 148, 74, 0.2); }
+  50% { border-color: rgba(68, 148, 74, 0.4); }
+}
+
+@keyframes caseGlow {
+  0%, 100% { box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10); }
+  50% { box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.05) inset, 0px 0px 40px rgba(0, 255, 102, 0.18); }
+}
+
 .case-card {
   display: block;
   background-color: #004524;
@@ -724,15 +768,36 @@ spline-viewer {
   border-radius: 32px;
   overflow: hidden;
   border: 1px solid rgba(68, 148, 74, 0.2);
-  transition: border-color 0.3s, transform 0.3s;
+  transition: border-color 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s ease;
   cursor: pointer;
   text-decoration: none;
   will-change: transform;
 }
 
+.case-card.case-visible {
+  animation: caseFadeIn 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.case-card.case-animated {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: casePulse 3s ease-in-out infinite, caseGlow 4s ease-in-out infinite;
+}
+
+.case-card.case-visible:nth-child(2) { animation-delay: 0.15s; }
+.case-card.case-visible:nth-child(3) { animation-delay: 0.3s; }
+
+.case-card.case-animated:nth-child(2) { animation-delay: 0.5s, 0.8s; }
+.case-card.case-animated:nth-child(3) { animation-delay: 1s, 1.6s; }
+
+.case-card.case-animated:hover {
+  animation: none !important;
+}
+
 .case-card:hover {
-  border-color: rgba(68, 148, 74, 0.5);
-  transform: translateY(-4px);
+  border-color: rgba(68, 148, 74, 0.6);
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.06) inset, 0px 20px 40px rgba(0, 0, 0, 0.2), 0px 0px 34px rgba(0, 255, 102, 0.15);
 }
 
 .case-image {
@@ -741,6 +806,7 @@ spline-viewer {
   object-fit: cover;
   margin: 16px;
   border-radius: 20px;
+  transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 @media (min-width: 768px) {
@@ -753,6 +819,7 @@ spline-viewer {
 }
 
 .case-card:hover .case-image {
+  transform: scale(1.04);
   opacity: 0.9;
 }
 
