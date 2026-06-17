@@ -85,6 +85,17 @@ img:not(.hero-image):not(.hero-image-placeholder):not(.case-detail-image) {
   animation-delay: 0.2s;
 }
 
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes caseFadeIn {
   from {
     opacity: 0;

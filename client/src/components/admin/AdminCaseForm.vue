@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { casesService } from '@/lib/casesService'
+import { casesService, uploadCaseImage, resolveCaseImage } from '@/lib/casesService'
 
 const router = useRouter()
 const route = useRoute()
@@ -23,8 +23,15 @@ const form = ref({
 const tagInput = ref('')
 const resultInput = ref('')
 const loading = ref(false)
+const uploading = ref(false)
+const selectedFile = ref(null)
+const previewUrl = ref('')
 
 const categories = ['development', 'seo', 'design', 'content', 'analytics']
+
+const currentPreview = computed(() => {
+  return previewUrl.value || resolveCaseImage(form.value.image)
+})
 
 onMounted(async () => {
   if (isEdit) {
@@ -34,6 +41,33 @@ onMounted(async () => {
     }
   }
 })
+
+onUnmounted(() => {
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
+})
+
+function handleFileSelect(e) {
+  const file = e.target.files[0]
+  if (!file) return
+
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
+
+  selectedFile.value = file
+  previewUrl.value = URL.createObjectURL(file)
+}
+
+function removeImage() {
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
+  selectedFile.value = null
+  previewUrl.value = ''
+  form.value.image = ''
+}
 
 function addTag() {
   const val = tagInput.value.trim()
@@ -62,6 +96,20 @@ function removeResult(index) {
 
 async function handleSubmit() {
   loading.value = true
+
+  if (selectedFile.value) {
+    uploading.value = true
+    const url = await uploadCaseImage(selectedFile.value)
+    uploading.value = false
+
+    if (!url) {
+      loading.value = false
+      return
+    }
+
+    form.value.image = url
+  }
+
   let result
 
   if (isEdit) {
@@ -103,8 +151,25 @@ async function handleSubmit() {
       </div>
 
       <div class="field">
-        <label>Изображение (путь)</label>
-        <input v-model="form.image" placeholder="/src/assets/images/example.webp" />
+        <label>Изображение</label>
+        <div class="image-upload">
+          <div v-if="currentPreview" class="image-preview">
+            <img :src="currentPreview" alt="preview" />
+            <button type="button" class="image-remove" @click="removeImage" title="Удалить">×</button>
+          </div>
+          <div class="upload-zone">
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              class="file-input"
+              @change="handleFileSelect"
+              :id="'file-input-' + (isEdit ? route.params.id : 'new')"
+            />
+            <label :for="'file-input-' + (isEdit ? route.params.id : 'new')" class="file-label">
+              {{ selectedFile ? selectedFile.name : 'Выберите файл' }}
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="field">
@@ -172,6 +237,15 @@ async function handleSubmit() {
 .field label { font-size: 13px; font-family: 'Roboto Mono', monospace; color: #333; font-weight: 500; }
 .field input, .field textarea, .field select { padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; font-family: 'Roboto Mono', monospace; outline: none; transition: border-color 0.2s; }
 .field input:focus, .field textarea:focus, .field select:focus { border-color: #44944A; }
+.image-upload { display: flex; flex-direction: column; gap: 12px; }
+.image-preview { position: relative; display: inline-block; max-width: 400px; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; }
+.image-preview img { width: 100%; height: 200px; object-fit: cover; display: block; }
+.image-remove { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,0.6); color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background 0.2s; }
+.image-remove:hover { background: rgba(0,0,0,0.8); }
+.upload-zone { display: flex; }
+.file-input { display: none; }
+.file-label { display: inline-flex; align-items: center; padding: 10px 20px; background: #f5f5f5; border: 1px dashed #ccc; border-radius: 10px; cursor: pointer; font-size: 13px; font-family: 'Roboto Mono', monospace; color: #666; transition: all 0.2s; width: 100%; max-width: 400px; }
+.file-label:hover { border-color: #44944A; color: #44944A; background: #f0faf0; }
 .tag-input { display: flex; gap: 8px; }
 .tag-input input { flex: 1; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }

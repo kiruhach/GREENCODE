@@ -164,8 +164,10 @@ const reasons = [
   margin: 0 auto;
   padding: 32px 24px 64px;
   background-size: cover;
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
+  border-radius: 40px;
+  animation: heroFadeIn 0.8s ease-out;
 }
 
 .hero-grid {

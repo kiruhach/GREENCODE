@@ -162,9 +162,11 @@ watch(filteredCases, () => {
   margin: 0 auto;
   padding: 32px 24px 48px;
   background-size: cover;
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
   min-height: 800px;
+  border-radius: 40px;
+  animation: heroFadeIn 0.8s ease-out;
 }
 
 @media (min-width: 768px) {

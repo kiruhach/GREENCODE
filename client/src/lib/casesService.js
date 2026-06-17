@@ -11,6 +11,46 @@ export function resolveCaseImage(path) {
   return caseImages[path] || path
 }
 
+export async function uploadCaseImage(file) {
+  const ext = file.name.split('.').pop()
+  const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+
+  const { error } = await supabase.storage
+    .from('case-images')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    })
+
+  if (error) {
+    console.error('Error uploading image:', error)
+    return null
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('case-images')
+    .getPublicUrl(fileName)
+
+  return publicUrl
+}
+
+export async function deleteCaseImage(url) {
+  if (!url || !url.includes('case-images')) return true
+
+  const fileName = url.split('/').pop()
+
+  const { error } = await supabase.storage
+    .from('case-images')
+    .remove([fileName])
+
+  if (error) {
+    console.error('Error deleting image:', error)
+    return false
+  }
+
+  return true
+}
+
 export const casesService = {
   async getAll() {
     const { data, error } = await supabase

@@ -292,6 +292,8 @@ async function submitForm() {
   max-width: 1920px;
   margin: 0 auto;
   padding: 32px 24px 64px;
+  border-radius: 40px;
+  animation: heroFadeIn 0.8s ease-out;
 }
 
 .hero-grid {
