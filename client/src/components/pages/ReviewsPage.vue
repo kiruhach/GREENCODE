@@ -37,7 +37,7 @@ const submitReview = async () => {
   }
   const data = await reviewsService.create(review)
   if (data) {
-    reviews.value.unshift(data[0])
+    reviews.value.unshift(data)
   }
   form.value = { name: '', role: '', review: '' }
   showModal.value = false
