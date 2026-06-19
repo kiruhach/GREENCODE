@@ -19,6 +19,7 @@ Route::get('services/details/all', [ServicesController::class, 'allDetails']);
 
 Route::get('reviews', [ReviewsController::class, 'index']);
 Route::get('reviews/latest', [ReviewsController::class, 'latest']);
+Route::post('reviews', [ReviewsController::class, 'store']);
 
 Route::post('applications', [ApplicationsController::class, 'store']);
 
@@ -38,7 +39,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('services/{id}', [ServicesController::class, 'update']);
     Route::delete('services/{id}', [ServicesController::class, 'destroy']);
 
-    Route::post('reviews', [ReviewsController::class, 'store']);
     Route::put('reviews/{id}', [ReviewsController::class, 'update']);
     Route::delete('reviews/{id}', [ReviewsController::class, 'destroy']);
 
