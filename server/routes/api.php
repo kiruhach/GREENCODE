@@ -8,15 +8,6 @@ use App\Http\Controllers\Api\ApplicationsController;
 use App\Http\Controllers\Api\UploadController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('env', function () {
-    return response()->json([
-        'DATABASE_URL' => env('DATABASE_URL'),
-        'DB_HOST' => env('DB_HOST'),
-        'DB_PORT' => env('DB_PORT'),
-        'DB_CONNECTION' => env('DB_CONNECTION'),
-    ]);
-});
-
 // Публичные маршруты
 Route::get('cases', [CasesController::class, 'index']);
 Route::get('cases/{id}', [CasesController::class, 'show']);

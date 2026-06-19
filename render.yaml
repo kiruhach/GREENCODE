@@ -24,8 +24,6 @@ services:
         value: https://greencode-qg35.onrender.com
       - key: DB_CONNECTION
         value: pgsql
-      - key: DATABASE_URL
-        value: postgresql://greencode:SbGcj5aJA8UhbKOUSOW3goXQWKW3RUvl@dpg-d8qlihugvqtc73duempg-a/greencode_yohu
       - key: SANCTUM_STATEFUL_DOMAINS
         value: greencode-qg35.onrender.com
       - key: SESSION_DRIVER
