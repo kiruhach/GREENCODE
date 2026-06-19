@@ -30,3 +30,5 @@ services:
         value: file
       - key: SESSION_DOMAIN
         value: greencode-qg35.onrender.com
+      - key: SESSION_SECURE_COOKIE
+        value: true

@@ -28,6 +28,8 @@ RUN cp .env.example .env && \
     sed -i 's/APP_URL=.*/APP_URL=/' .env && \
     sed -i 's/SANCTUM_STATEFUL_DOMAINS=.*/SANCTUM_STATEFUL_DOMAINS=/' .env
 
+RUN chmod -R 777 storage bootstrap/cache
+
 RUN composer install --optimize-autoloader --no-dev
 
 RUN php artisan key:generate
