@@ -24,7 +24,7 @@ COPY . .
 
 RUN cp .env.example .env && \
     sed -i 's/APP_ENV=.*/APP_ENV=production/' .env && \
-    sed -i 's/APP_DEBUG=.*/APP_DEBUG=false/' .env && \
+    sed -i 's/APP_DEBUG=.*/APP_DEBUG=true/' .env && \
     sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env && \
     sed -i 's/SESSION_DOMAIN=.*/SESSION_DOMAIN=/' .env && \
     sed -i 's/APP_URL=.*/APP_URL=https:\/\/greencode-qg35.onrender.com/' .env && \
