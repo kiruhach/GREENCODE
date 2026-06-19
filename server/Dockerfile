@@ -23,10 +23,13 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN cp .env.example .env && \
-    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/' .env && \
+    sed -i 's/APP_ENV=.*/APP_ENV=production/' .env && \
+    sed -i 's/APP_DEBUG=.*/APP_DEBUG=false/' .env && \
+    sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env && \
     sed -i 's/SESSION_DOMAIN=.*/SESSION_DOMAIN=/' .env && \
-    sed -i 's/APP_URL=.*/APP_URL=/' .env && \
-    sed -i 's/SANCTUM_STATEFUL_DOMAINS=.*/SANCTUM_STATEFUL_DOMAINS=/' .env
+    sed -i 's/APP_URL=.*/APP_URL=https:\/\/greencode-qg35.onrender.com/' .env && \
+    sed -i 's/SANCTUM_STATEFUL_DOMAINS=.*/SANCTUM_STATEFUL_DOMAINS=greencode-qg35.onrender.com/' .env && \
+    echo 'SESSION_SECURE_COOKIE=true' >> .env
 
 RUN chmod -R 777 storage bootstrap/cache
 
@@ -52,8 +55,7 @@ RUN apk add --no-cache \
         bcmath \
         ctype \
         fileinfo \
-        curl \
-    && sed -i 's/^clear_env = yes/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf
+        curl
 
 COPY --from=build /var/www/html /var/www/html
 
