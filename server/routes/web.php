@@ -8,4 +8,4 @@ Route::get('/', function () {
 
 Route::get('/{any}', function () {
     return response()->file(public_path('index.html'));
-})->where('any', '.*');
+})->where('any', '^(?!admin).*$');

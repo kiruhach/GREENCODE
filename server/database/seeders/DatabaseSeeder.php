@@ -21,6 +21,11 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        ServiceDetail::query()->delete();
+        Service::query()->delete();
+        ProjectCase::query()->delete();
+        Review::query()->delete();
+
         $services = [
             [
                 'title' => 'Разработка сайтов',
