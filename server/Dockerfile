@@ -26,6 +26,11 @@ RUN cp .env.example .env && \
     sed -i 's/APP_ENV=.*/APP_ENV=production/' .env && \
     sed -i 's/APP_DEBUG=.*/APP_DEBUG=true/' .env && \
     sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env && \
+    sed -i 's/DB_HOST=.*/DB_HOST=dpg-d8qlihugvqtc73duempg-a/' .env && \
+    sed -i 's/DB_PORT=.*/DB_PORT=5432/' .env && \
+    sed -i 's/DB_DATABASE=.*/DB_DATABASE=greencode_yohu/' .env && \
+    sed -i 's/DB_USERNAME=.*/DB_USERNAME=greencode/' .env && \
+    sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=SbGcj5aJA8UhbKOUSOW3goXQWKW3RUvl/' .env && \
     sed -i 's/SESSION_DOMAIN=.*/SESSION_DOMAIN=/' .env && \
     sed -i 's/APP_URL=.*/APP_URL=https:\/\/greencode-qg35.onrender.com/' .env && \
     sed -i 's/SANCTUM_STATEFUL_DOMAINS=.*/SANCTUM_STATEFUL_DOMAINS=greencode-qg35.onrender.com/' .env && \
