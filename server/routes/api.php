@@ -8,6 +8,27 @@ use App\Http\Controllers\Api\ApplicationsController;
 use App\Http\Controllers\Api\UploadController;
 use Illuminate\Support\Facades\Route;
 
+// Диагностика
+Route::get('ping', function () {
+    return response()->json(['message' => 'pong']);
+});
+
+Route::get('db-check', function () {
+    try {
+        \DB::connection()->getPdo();
+        return response()->json([
+            'connected' => true,
+            'driver' => \DB::connection()->getDriverName(),
+            'database' => \DB::connection()->getDatabaseName(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'connected' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+});
+
 // Публичные маршруты
 Route::get('cases', [CasesController::class, 'index']);
 Route::get('cases/{id}', [CasesController::class, 'show']);
