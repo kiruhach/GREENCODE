@@ -1,7 +1,20 @@
 FROM php:8.1-cli-alpine
 
-RUN apk add --no-cache postgresql-dev && \
-    docker-php-ext-install pdo_pgsql pdo_mysql
+RUN apk add --no-cache \
+        postgresql-dev \
+        libxml2-dev \
+        oniguruma-dev \
+        zip \
+        curl-dev \
+    && docker-php-ext-install \
+        pdo_pgsql \
+        pdo_mysql \
+        mbstring \
+        xml \
+        bcmath \
+        ctype \
+        fileinfo \
+        curl
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -9,7 +22,11 @@ WORKDIR /var/www/html
 
 COPY . .
 
+RUN cp .env.example .env
+
 RUN composer install --optimize-autoloader --no-dev
+
+RUN php artisan key:generate
 
 RUN php artisan storage:link
 
