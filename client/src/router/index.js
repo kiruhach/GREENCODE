@@ -7,16 +7,7 @@ import AboutPage from '../components/pages/AboutPage.vue'
 import ContactsPage from '../components/pages/ContactsPage.vue'
 import ApplicationPage from '../components/pages/ApplicationPage.vue'
 import ReviewsPage from '../components/pages/ReviewsPage.vue'
-import AdminLayout from '../components/admin/AdminLayout.vue'
-import AdminLogin from '../components/admin/AdminLogin.vue'
-import AdminDashboard from '../components/admin/AdminDashboard.vue'
-import AdminCases from '../components/admin/AdminCases.vue'
-import AdminCaseForm from '../components/admin/AdminCaseForm.vue'
-import AdminServices from '../components/admin/AdminServices.vue'
-import AdminServiceForm from '../components/admin/AdminServiceForm.vue'
-import AdminReviews from '../components/admin/AdminReviews.vue'
-import AdminReviewForm from '../components/admin/AdminReviewForm.vue'
-import AdminApplications from '../components/admin/AdminApplications.vue'
+
 
 const routes = [
   {
@@ -98,84 +89,6 @@ const routes = [
       description: 'Отзывы клиентов о совместной работе и результатах. Мнения партнёров о команде GREENCODE.',
       h1: 'Отзывы клиентов'
     }
-  },
-  {
-    path: '/admin',
-    component: AdminLayout,
-    children: [
-      {
-        path: '',
-        name: 'AdminDashboard',
-        component: AdminDashboard,
-        meta: { title: 'Дашборд — GREENCODE Admin' }
-      },
-      {
-        path: 'login',
-        name: 'AdminLogin',
-        component: AdminLogin,
-        meta: { title: 'Вход — GREENCODE Admin' }
-      },
-      {
-        path: 'cases',
-        name: 'AdminCases',
-        component: AdminCases,
-        meta: { title: 'Кейсы — GREENCODE Admin' }
-      },
-      {
-        path: 'cases/new',
-        name: 'AdminCaseNew',
-        component: AdminCaseForm,
-        meta: { title: 'Новый кейс — GREENCODE Admin' }
-      },
-      {
-        path: 'cases/:id/edit',
-        name: 'AdminCaseEdit',
-        component: AdminCaseForm,
-        meta: { title: 'Редактировать кейс — GREENCODE Admin' }
-      },
-      {
-        path: 'services',
-        name: 'AdminServices',
-        component: AdminServices,
-        meta: { title: 'Услуги — GREENCODE Admin' }
-      },
-      {
-        path: 'services/new',
-        name: 'AdminServiceNew',
-        component: AdminServiceForm,
-        meta: { title: 'Новая услуга — GREENCODE Admin' }
-      },
-      {
-        path: 'services/:id/edit',
-        name: 'AdminServiceEdit',
-        component: AdminServiceForm,
-        meta: { title: 'Редактировать услугу — GREENCODE Admin' }
-      },
-      {
-        path: 'reviews',
-        name: 'AdminReviews',
-        component: AdminReviews,
-        meta: { title: 'Отзывы — GREENCODE Admin' }
-      },
-      {
-        path: 'reviews/new',
-        name: 'AdminReviewNew',
-        component: AdminReviewForm,
-        meta: { title: 'Новый отзыв — GREENCODE Admin' }
-      },
-      {
-        path: 'reviews/:id/edit',
-        name: 'AdminReviewEdit',
-        component: AdminReviewForm,
-        meta: { title: 'Редактировать отзыв — GREENCODE Admin' }
-      },
-      {
-        path: 'applications',
-        name: 'AdminApplications',
-        component: AdminApplications,
-        meta: { title: 'Заявки — GREENCODE Admin' }
-      }
-    ]
   },
   {
     path: '/:pathMatch(.*)*',

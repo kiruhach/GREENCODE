@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '@/lib/supabase'
+import { applicationsService } from '@/lib/applicationsService'
 import checkMarkIcon from '@/assets/icons/check_mark.svg?url'
 
 const services = ['Сайт', 'SEO', 'Брендинг', 'Контент', 'Аналитика', 'Дизайн']
@@ -80,9 +80,8 @@ async function submitForm() {
   loading.value = true
   error.value = ''
 
-  const { error: err } = await supabase
-    .from('applications')
-    .insert({
+  try {
+    await applicationsService.create({
       name: name.value,
       email: email.value || null,
       phone: phone.value || null,
@@ -94,13 +93,7 @@ async function submitForm() {
       contact_format: contactFormat.value || null,
       services: selectedServices.value
     })
-
-  loading.value = false
-
-  if (err) {
-    error.value = 'Ошибка при отправке. Попробуйте ещё раз.'
-    console.error('Supabase error:', err)
-  } else {
+    loading.value = false
     success.value = true
     name.value = ''
     email.value = ''
@@ -112,7 +105,10 @@ async function submitForm() {
     timeframe.value = ''
     contactFormat.value = ''
     selectedServices.value = []
+  } catch {
+    error.value = 'Ошибка при отправке. Попробуйте ещё раз.'
   }
+  loading.value = false
 }
 </script>
 

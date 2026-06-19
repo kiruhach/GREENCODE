@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
-import { supabase } from '@/lib/supabase';
+import { casesService } from '@/lib/casesService'
 import { resolveCaseImage } from '@/lib/casesService';
 import casesBg from '@/assets/images/cases.webp?url';
 
@@ -49,13 +49,10 @@ function observeCases() {
 
 async function fetchCases() {
   loading.value = true
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (!error && data) {
-    cases.value = data
+  try {
+    cases.value = await casesService.getAll()
+  } catch (e) {
+    console.error('Error fetching cases:', e)
   }
   loading.value = false
 }

@@ -1,8 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { supabase } from '@/lib/supabase'
-import { resolveCaseImage } from '@/lib/casesService'
+import { casesService, resolveCaseImage } from '@/lib/casesService'
 
 const route = useRoute()
 const currentCase = ref(null)
@@ -14,14 +13,10 @@ onMounted(async () => {
 
 async function fetchCase() {
   loading.value = true
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*')
-    .eq('id', route.params.id)
-    .single()
-
-  if (!error && data) {
-    currentCase.value = data
+  try {
+    currentCase.value = await casesService.getById(route.params.id)
+  } catch (e) {
+    console.error('Error fetching case:', e)
   }
   loading.value = false
 }

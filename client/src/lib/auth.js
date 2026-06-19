@@ -1,22 +1,43 @@
 import { ref } from 'vue'
-import { supabase } from './supabase'
+import api from './api'
 
 export const user = ref(null)
 
 export async function getSession() {
-  const { data: { session } } = await supabase.auth.getSession()
-  user.value = session?.user ?? null
-  return session
+  const token = localStorage.getItem('admin_token')
+  if (!token) {
+    user.value = null
+    return null
+  }
+
+  try {
+    const response = await api.get('auth/user')
+    user.value = response.data
+    return response.data
+  } catch {
+    user.value = null
+    localStorage.removeItem('admin_token')
+    return null
+  }
 }
 
 export async function signIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) return { error }
-  user.value = data.user
-  return { data }
+  try {
+    const response = await api.post('auth/login', { email, password })
+    localStorage.setItem('admin_token', response.data.token)
+    user.value = response.data.user
+    return { data: response.data }
+  } catch (error) {
+    return { error: error.response?.data?.errors?.email?.[0] || 'Ошибка входа' }
+  }
 }
 
 export async function signOut() {
-  await supabase.auth.signOut()
+  try {
+    await api.post('auth/logout')
+  } catch {
+    // ignore
+  }
+  localStorage.removeItem('admin_token')
   user.value = null
 }

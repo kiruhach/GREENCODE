@@ -1,15 +1,53 @@
+databases:
+  - name: greencode-db
+    databaseName: greencode
+    user: greencode
+    region: frankfurt
+    plan: free
+
 services:
   - type: web
     name: greencode
-    env: static
-    rootDir: client
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    runtime: php
+    rootDir: server
+    region: frankfurt
+    plan: free
+    buildCommand: composer install --optimize-autoloader --no-dev
+    startCommand: ./start.sh
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://greencode.onrender.com
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_DATABASE
+        fromDatabase:
+          name: greencode-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: greencode-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: greencode-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: greencode-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: greencode-db
+          property: port
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: greencode.onrender.com
+      - key: SESSION_DRIVER
+        value: file
+      - key: SESSION_DOMAIN
+        value: greencode.onrender.com

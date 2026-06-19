@@ -1,62 +1,28 @@
-import { supabase } from './supabase'
+import api from './api'
 
 export const applicationsService = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('applications')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching applications:', error)
-      return null
-    }
-
-    return data
+    const response = await api.get('applications')
+    return response.data
   },
 
   async getById(id) {
-    const { data, error } = await supabase
-      .from('applications')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const response = await api.get(`applications/${id}`)
+    return response.data
+  },
 
-    if (error) {
-      console.error('Error fetching application:', error)
-      return null
-    }
-
-    return data
+  async create(data) {
+    const response = await api.post('applications', data)
+    return response.data
   },
 
   async updateStatus(id, status) {
-    const { data, error } = await supabase
-      .from('applications')
-      .update({ status })
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error updating application status:', error)
-      return null
-    }
-
-    return data
+    const response = await api.put(`applications/${id}/status`, { status })
+    return response.data
   },
 
   async remove(id) {
-    const { error } = await supabase
-      .from('applications')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error deleting application:', error)
-      return false
-    }
-
+    await api.delete(`applications/${id}`)
     return true
-  }
+  },
 }

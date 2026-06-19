@@ -1,91 +1,33 @@
-import { supabase } from './supabase'
+import api from './api'
 
 export const reviewsService = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching reviews:', error)
-      return null
-    }
-
-    return data
+    const response = await api.get('reviews')
+    return response.data
   },
 
   async getById(id) {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) {
-      console.error('Error fetching review:', error)
-      return null
-    }
-
-    return data
+    const response = await api.get(`reviews/${id}`)
+    return response.data
   },
 
   async getLatest(limit = 2) {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) {
-      console.error('Error fetching latest reviews:', error)
-      return null
-    }
-
-    return data
+    const response = await api.get('reviews/latest', { params: { limit } })
+    return response.data
   },
 
   async create(review) {
-    const { data, error } = await supabase
-      .from('reviews')
-      .insert(review)
-      .select()
-
-    if (error) {
-      console.error('Error creating review:', error)
-      return null
-    }
-
-    return data
+    const response = await api.post('reviews', review)
+    return response.data
   },
 
   async update(id, review) {
-    const { data, error } = await supabase
-      .from('reviews')
-      .update(review)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error updating review:', error)
-      return null
-    }
-
-    return data
+    const response = await api.put(`reviews/${id}`, review)
+    return response.data
   },
 
   async remove(id) {
-    const { error } = await supabase
-      .from('reviews')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error deleting review:', error)
-      return false
-    }
-
+    await api.delete(`reviews/${id}`)
     return true
-  }
+  },
 }

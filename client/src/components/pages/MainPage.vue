@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { supabase } from '@/lib/supabase'
+import { applicationsService } from '@/lib/applicationsService'
 import { casesService, resolveCaseImage } from '@/lib/casesService'
 import { reviewsService } from '@/lib/reviewsService'
 import heroBg from '@/assets/images/hero.webp?url';
@@ -153,26 +153,22 @@ async function submitForm() {
   loading.value = true
   error.value = ''
 
-  const { error: err } = await supabase
-    .from('applications')
-    .insert({
+  try {
+    await applicationsService.create({
       name: name.value,
       email: email.value || null,
       phone: phone.value || null,
       message: message.value || null
     })
-
-  loading.value = false
-
-  if (err) {
-    error.value = 'Ошибка при отправке. Попробуйте ещё раз.'
-    console.error('Supabase error:', err)
-  } else {
+    loading.value = false
     success.value = true
     name.value = ''
     email.value = ''
     phone.value = ''
     message.value = ''
+  } catch {
+    loading.value = false
+    error.value = 'Ошибка при отправке. Попробуйте ещё раз.'
   }
 }
 </script>
