@@ -8,12 +8,11 @@ databases:
 services:
   - type: web
     name: greencode
-    runtime: php
+    runtime: docker
     rootDir: server
+    dockerfilePath: ./Dockerfile
     region: frankfurt
     plan: free
-    buildCommand: composer install --optimize-autoloader --no-dev
-    startCommand: ./start.sh
     envVars:
       - key: APP_ENV
         value: production
