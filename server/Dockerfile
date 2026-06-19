@@ -38,7 +38,21 @@ RUN php artisan storage:link
 
 FROM php:8.1-fpm-alpine
 
-RUN apk add --no-cache nginx \
+RUN apk add --no-cache \
+        nginx \
+        postgresql-dev \
+        libxml2-dev \
+        oniguruma-dev \
+        zip \
+        curl-dev \
+    && docker-php-ext-install \
+        pdo_pgsql \
+        mbstring \
+        xml \
+        bcmath \
+        ctype \
+        fileinfo \
+        curl \
     && sed -i 's/^clear_env = yes/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf
 
 COPY --from=build /var/www/html /var/www/html
