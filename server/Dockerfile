@@ -22,7 +22,8 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN cp .env.example .env
+RUN cp .env.example .env && \
+    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/' .env
 
 RUN composer install --optimize-autoloader --no-dev
 
