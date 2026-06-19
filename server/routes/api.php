@@ -13,20 +13,25 @@ Route::get('ping', function () {
     return response()->json(['message' => 'pong']);
 });
 
-Route::get('db-check', function () {
-    try {
-        \DB::connection()->getPdo();
-        return response()->json([
-            'connected' => true,
-            'driver' => \DB::connection()->getDriverName(),
-            'database' => \DB::connection()->getDatabaseName(),
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'connected' => false,
-            'error' => $e->getMessage(),
-        ], 500);
-    }
+Route::get('env-dump', function () {
+    return response()->json([
+        'env_DB_CONNECTION' => env('DB_CONNECTION'),
+        'env_DB_HOST' => env('DB_HOST'),
+        'env_DB_PORT' => env('DB_PORT'),
+        'env_DB_DATABASE' => env('DB_DATABASE'),
+        'env_DB_USERNAME' => env('DB_USERNAME'),
+        'getenv_DB_CONNECTION' => getenv('DB_CONNECTION'),
+        'getenv_DB_HOST' => getenv('DB_HOST'),
+        'getenv_DB_PORT' => getenv('DB_PORT'),
+        'getenv_DB_DATABASE' => getenv('DB_DATABASE'),
+        'getenv_DB_USERNAME' => getenv('DB_USERNAME'),
+        '_ENV_DB_HOST' => $_ENV['DB_HOST'] ?? 'NOT SET',
+        '_ENV_DB_PORT' => $_ENV['DB_PORT'] ?? 'NOT SET',
+        '_SERVER_DB_HOST' => $_SERVER['DB_HOST'] ?? 'NOT SET',
+        '_SERVER_DB_PORT' => $_SERVER['DB_PORT'] ?? 'NOT SET',
+        'APP_ENV' => env('APP_ENV'),
+        'APP_KEY_exists' => env('APP_KEY') ? 'YES' : 'NO',
+    ]);
 });
 
 // Публичные маршруты
