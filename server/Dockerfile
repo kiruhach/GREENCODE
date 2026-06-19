@@ -23,7 +23,10 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN cp .env.example .env && \
-    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/' .env
+    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/' .env && \
+    sed -i 's/SESSION_DOMAIN=greencode/SESSION_DOMAIN=/' .env && \
+    sed -i 's/APP_URL=.*/APP_URL=/' .env && \
+    sed -i 's/SANCTUM_STATEFUL_DOMAINS=.*/SANCTUM_STATEFUL_DOMAINS=/' .env
 
 RUN composer install --optimize-autoloader --no-dev
 
