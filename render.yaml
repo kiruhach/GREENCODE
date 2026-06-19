@@ -17,13 +17,23 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: true
+        value: false
       - key: APP_KEY
         generateValue: true
       - key: APP_URL
-        value: https://greencode.onrender.com
+        value: https://greencode-qg35.onrender.com
       - key: DB_CONNECTION
         value: pgsql
+      - key: DATABASE_URL
+        value: postgresql://greencode:SbGcj5aJA8UhbKOUSOW3goXQWKW3RUvl@dpg-d8qlihugvqtc73duempg-a/greencode_yohu
+      - key: DB_HOST
+        fromDatabase:
+          name: greencode-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: greencode-db
+          property: port
       - key: DB_DATABASE
         fromDatabase:
           name: greencode-db
@@ -36,17 +46,9 @@ services:
         fromDatabase:
           name: greencode-db
           property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: greencode-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: greencode-db
-          property: port
       - key: SANCTUM_STATEFUL_DOMAINS
-        value: greencode.onrender.com
+        value: greencode-qg35.onrender.com
       - key: SESSION_DRIVER
         value: file
       - key: SESSION_DOMAIN
-        value: greencode.onrender.com
+        value: greencode-qg35.onrender.com
