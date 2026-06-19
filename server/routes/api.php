@@ -29,6 +29,8 @@ Route::get('env-dump', function () {
         '_ENV_DB_PORT' => $_ENV['DB_PORT'] ?? 'NOT SET',
         '_SERVER_DB_HOST' => $_SERVER['DB_HOST'] ?? 'NOT SET',
         '_SERVER_DB_PORT' => $_SERVER['DB_PORT'] ?? 'NOT SET',
+        'DATABASE_URL' => env('DATABASE_URL'),
+        '_ENV_DATABASE_URL' => $_ENV['DATABASE_URL'] ?? 'NOT SET',
         'APP_ENV' => env('APP_ENV'),
         'APP_KEY_exists' => env('APP_KEY') ? 'YES' : 'NO',
     ]);
