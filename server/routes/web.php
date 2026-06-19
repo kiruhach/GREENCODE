@@ -20,3 +20,5 @@ Route::get('/debug', function () {
         'cookies' => $cookies,
     ]);
 });
+
+// Debug route - remove in production

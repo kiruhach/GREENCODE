@@ -24,11 +24,24 @@ services:
         value: https://greencode-qg35.onrender.com
       - key: DB_CONNECTION
         value: pgsql
+      - key: DB_USERNAME
+        fromDatabase: greencode-db
+        property: user
+      - key: DB_PASSWORD
+        fromDatabase: greencode-db
+        property: password
+      - key: DB_HOST
+        fromDatabase: greencode-db
+        property: host
+      - key: DB_PORT
+        fromDatabase: greencode-db
+        property: port
+      - key: DB_DATABASE
+        fromDatabase: greencode-db
+        property: database
       - key: SANCTUM_STATEFUL_DOMAINS
         value: greencode-qg35.onrender.com
       - key: SESSION_DRIVER
         value: file
-      - key: SESSION_DOMAIN
-        value: greencode-qg35.onrender.com
       - key: SESSION_SECURE_COOKIE
         value: true

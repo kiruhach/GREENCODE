@@ -1,4 +1,4 @@
-FROM php:8.1-cli-alpine
+FROM php:8.1-fpm-alpine AS build
 
 RUN apk add --no-cache \
         postgresql-dev \
@@ -36,8 +36,20 @@ RUN php artisan key:generate
 
 RUN php artisan storage:link
 
+FROM php:8.1-fpm-alpine
+
+RUN apk add --no-cache nginx \
+    && sed -i 's/^clear_env = yes/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf
+
+COPY --from=build /var/www/html /var/www/html
+
+COPY nginx.conf.template /etc/nginx/nginx.conf
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+WORKDIR /var/www/html
+
 EXPOSE $PORT
 
-CMD php artisan migrate --force && \
-    php artisan db:seed --force && \
-    php artisan serve --host=0.0.0.0 --port=$PORT
+ENTRYPOINT ["docker-entrypoint.sh"]
