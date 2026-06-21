@@ -11,6 +11,7 @@ const message = ref('')
 const loading = ref(false)
 const success = ref(false)
 const error = ref('')
+const fieldErrors = ref({})
 
 const handleEmailInput = (e) => {
   const latinOnly = e.target.value.replace(/[^a-zA-Z0-9@._-]/g, '')
@@ -38,14 +39,25 @@ const formatPhone = (e) => {
   phone.value = formatted
 }
 
+function validate() {
+  const errs = {}
+  if (!name.value.trim()) errs.name = 'Укажите ваше имя'
+  if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
+  if (phone.value && !/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
+  fieldErrors.value = errs
+  return Object.keys(errs).length === 0
+}
+
+function fieldClass(field) {
+  return { 'form-input--error': fieldErrors.value[field] }
+}
+
 async function submitForm() {
-  if (!name.value.trim()) {
-    error.value = 'Укажите ваше имя'
-    return
-  }
+  if (!validate()) return
 
   loading.value = true
   error.value = ''
+  fieldErrors.value = {}
 
   try {
     await applicationsService.create({
@@ -125,16 +137,19 @@ async function submitForm() {
             <!-- Name & Email -->
             <div class="form-fields">
               <div class="form-field">
-                <input v-model="name" type="text" placeholder="Имя" class="form-input" />
+                <input v-model="name" type="text" placeholder="Имя *" class="form-input" :class="fieldClass('name')" />
+                <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
               </div>
               <div class="form-field">
-                <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" />
+                <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" :class="fieldClass('email')" />
+                <p v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</p>
               </div>
             </div>
 
             <!-- Phone -->
             <div class="form-field">
-              <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" maxlength="18" />
+              <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" :class="fieldClass('phone')" maxlength="18" />
+              <p v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone }}</p>
             </div>
 
             <!-- Company Section -->
@@ -156,7 +171,8 @@ async function submitForm() {
 
             <!-- Task Description -->
             <div class="form-field form-textarea-field">
-              <textarea v-model="message" placeholder="Опишите задачу: запуск нового сайта, SEO, ребрендинг, улучшение конверсии или комплексная работа" class="form-input form-textarea"></textarea>
+              <textarea v-model="message" placeholder="Опишите задачу: запуск нового сайта, SEO, ребрендинг, улучшение конверсии или комплексная работа" class="form-input form-textarea" maxlength="1000"></textarea>
+              <div class="char-counter">{{ (message || '').length }}/1000</div>
             </div>
 
             <!-- Submit -->
@@ -200,17 +216,18 @@ async function submitForm() {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px 16px 48px;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-  min-height: 800px;
+  min-height: auto;
   border-radius: 40px;
   animation: heroFadeIn 0.8s ease-out;
 }
 
 @media (min-width: 768px) {
   .hero-section {
+    padding: 32px 24px 64px;
     min-height: 900px;
   }
 }
@@ -239,7 +256,7 @@ async function submitForm() {
 
 .hero-title {
   color: #004524;
-  font-size: 48px;
+  font-size: 36px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.1;
@@ -303,15 +320,23 @@ async function submitForm() {
 .contact-card {
   background-color: #004524;
   border-radius: 16px;
-  padding: 24px;
+  padding: 20px;
   width: 100%;
   max-width: 552px;
-  min-height: 266px;
+  min-height: auto;
   box-sizing: border-box;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+@media (min-width: 768px) {
+  .contact-card {
+    padding: 24px;
+    min-height: 266px;
+    margin-bottom: 24px;
+  }
 }
 
 .contact-label {
@@ -325,18 +350,30 @@ async function submitForm() {
 
 .contact-value {
   color: white;
-  font-size: 30px;
+  font-size: 22px;
   font-family: 'Space Grotesk', sans-serif;
   text-align: right;
+}
+
+@media (min-width: 768px) {
+  .contact-value {
+    font-size: 30px;
+  }
 }
 
 .form-card {
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 36px;
-  padding: 40px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
-  min-height: 900px;
+}
+
+@media (min-width: 768px) {
+  .form-card {
+    padding: 40px;
+    min-height: 900px;
+  }
 }
 
 .form-label {
@@ -349,16 +386,17 @@ async function submitForm() {
 
 .form-title {
   color: white;
-  font-size: 48px;
+  font-size: 32px;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: bold;
   line-height: 1.15;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
   .form-title {
     font-size: 62px;
+    margin-bottom: 32px;
   }
 }
 
@@ -396,8 +434,14 @@ async function submitForm() {
 .form-field {
   background-color: rgba(255, 255, 255, 0.04);
   border-radius: 22px;
-  padding: 20px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 768px) {
+  .form-field {
+    padding: 20px;
+  }
 }
 
 .form-input {
@@ -410,8 +454,27 @@ async function submitForm() {
   outline: none;
 }
 
+.form-input--error {
+  color: #ff6b6b;
+}
+
 .form-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
+}
+
+.field-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  margin-top: 8px;
+}
+
+.char-counter {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  text-align: right;
+  margin-top: 6px;
 }
 
 .form-textarea-field {

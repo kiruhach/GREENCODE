@@ -9,26 +9,36 @@ const selectedTag = ref(null)
 const selectedCategory = ref('')
 const isModalOpen = ref(false)
 const loading = ref(true)
+const error = ref('')
 
 onMounted(async () => {
-  const [servicesData, detailsData] = await Promise.all([
-    servicesService.getAll(),
-    servicesService.getAllDetails()
-  ])
-
-  if (servicesData) {
-    services.value = servicesData
-  }
-
-  if (detailsData) {
-    detailsMap.value = {}
-    detailsData.forEach(d => {
-      detailsMap.value[d.sub_item] = d.description
-    })
-  }
-
-  loading.value = false
+  await fetchData()
 })
+
+async function fetchData() {
+  loading.value = true
+  error.value = ''
+  try {
+    const [servicesData, detailsData] = await Promise.all([
+      servicesService.getAll(),
+      servicesService.getAllDetails()
+    ])
+
+    if (servicesData) {
+      services.value = servicesData
+    }
+
+    if (detailsData) {
+      detailsMap.value = {}
+      detailsData.forEach(d => {
+        detailsMap.value[d.sub_item] = d.description
+      })
+    }
+  } catch {
+    error.value = 'Не удалось загрузить услуги'
+  }
+  loading.value = false
+}
 
 const openTagModal = (tag, category) => {
   selectedCategory.value = category
@@ -70,7 +80,14 @@ const closeModal = () => {
 
     <!-- Services Grid -->
     <section class="services-section">
-      <div v-if="loading" class="loading">Загрузка...</div>
+      <div v-if="loading" class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="error" class="error-block">
+        <p>{{ error }}</p>
+        <button class="retry-btn" @click="fetchData">Повторить</button>
+      </div>
+      <div v-else-if="services.length === 0" class="empty-block">Услуги пока не добавлены</div>
       <div v-else class="services-grid">
         <div 
           v-for="service in services" 
@@ -142,17 +159,18 @@ const closeModal = () => {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 32px 16px 48px;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-  min-height: 800px;
+  min-height: auto;
   border-radius: 40px;
   animation: heroFadeIn 0.8s ease-out;
 }
 
 @media (min-width: 768px) {
   .hero-section {
+    padding: 32px 24px 80px;
     min-height: 900px;
   }
 }
@@ -322,8 +340,15 @@ const closeModal = () => {
 
 .sub-items-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .sub-items-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
 }
 
 .sub-item {
@@ -454,12 +479,60 @@ const closeModal = () => {
   transform: translateX(100%);
 }
 
-.loading {
+.spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(68, 148, 74, 0.2);
+  border-top-color: #44944A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-block {
   text-align: center;
   padding: 48px;
   color: #004524;
-  font-size: 18px;
   font-family: 'Roboto Mono', monospace;
+}
+
+.error-block p {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.retry-btn {
+  padding: 10px 24px;
+  background: #44944A;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3a7d3d;
+}
+
+.empty-block {
+  text-align: center;
+  padding: 48px;
+  color: #004524;
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  opacity: 0.7;
 }
 
 @media (max-width: 768px) {

@@ -31,19 +31,4 @@ export const servicesService = {
     const response = await api.get('services/details/all')
     return response.data
   },
-
-  async create(serviceData) {
-    const response = await api.post('services', serviceData)
-    return response.data
-  },
-
-  async update(id, serviceData) {
-    const response = await api.put(`services/${id}`, serviceData)
-    return response.data
-  },
-
-  async remove(id) {
-    await api.delete(`services/${id}`)
-    return true
-  },
 }

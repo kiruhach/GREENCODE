@@ -6,6 +6,9 @@ const showModal = ref(false)
 const form = ref({ name: '', role: '', review: '' })
 const reviews = ref([])
 const loading = ref(true)
+const error = ref('')
+const submitting = ref(false)
+const submitError = ref('')
 
 onMounted(async () => {
   await fetchReviews()
@@ -13,9 +16,14 @@ onMounted(async () => {
 
 async function fetchReviews() {
   loading.value = true
-  const data = await reviewsService.getAll()
-  if (data) {
-    reviews.value = data
+  error.value = ''
+  try {
+    const data = await reviewsService.getAll()
+    if (data) {
+      reviews.value = data
+    }
+  } catch {
+    error.value = 'Не удалось загрузить отзывы'
   }
   loading.value = false
 }
@@ -28,19 +36,39 @@ function getInitials(name) {
   return parts[0].slice(0, 2).toUpperCase()
 }
 
+const modalErrors = ref({})
+
+function validateModal() {
+  const errs = {}
+  if (!form.value.name.trim()) errs.name = 'Укажите ваше имя'
+  if (!form.value.review.trim()) errs.review = 'Напишите отзыв'
+  modalErrors.value = errs
+  return Object.keys(errs).length === 0
+}
+
 const submitReview = async () => {
-  const review = {
-    name: form.value.name,
-    role: form.value.role || '',
-    text: form.value.review,
-    initials: getInitials(form.value.name)
+  if (!validateModal()) return
+
+  submitError.value = ''
+  modalErrors.value = {}
+  submitting.value = true
+  try {
+    const review = {
+      name: form.value.name,
+      role: form.value.role || '',
+      text: form.value.review,
+      initials: getInitials(form.value.name)
+    }
+    const data = await reviewsService.create(review)
+    if (data) {
+      reviews.value.unshift(data)
+    }
+    form.value = { name: '', role: '', review: '' }
+    showModal.value = false
+  } catch {
+    submitError.value = 'Ошибка при отправке. Попробуйте ещё раз.'
   }
-  const data = await reviewsService.create(review)
-  if (data) {
-    reviews.value.unshift(data)
-  }
-  form.value = { name: '', role: '', review: '' }
-  showModal.value = false
+  submitting.value = false
 }
 </script>
 
@@ -75,6 +103,15 @@ const submitReview = async () => {
 
     <!-- Reviews Grid -->
     <section class="reviews-section">
+      <div v-if="loading" class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="error" class="error-block">
+        <p>{{ error }}</p>
+        <button class="retry-btn" @click="fetchReviews">Повторить</button>
+      </div>
+      <div v-else-if="reviews.length === 0" class="empty-block">Отзывов пока нет</div>
+      <template v-else>
       <div class="reviews-grid">
         <div 
           v-for="(review, index) in reviews" 
@@ -96,6 +133,7 @@ const submitReview = async () => {
           </div>
         </div>
       </div>
+      </template>
     </section>
 
     <!-- CTA Section -->
@@ -120,10 +158,11 @@ const submitReview = async () => {
                 <input 
                   v-model="form.name"
                   type="text" 
-                  placeholder="Ваше имя" 
+                  placeholder="Ваше имя *" 
                   class="modal-input"
-                  required
+                  :class="{ 'modal-input--error': modalErrors.name }"
                 />
+                <p v-if="modalErrors.name" class="modal-field-error">{{ modalErrors.name }}</p>
                 <input 
                   v-model="form.role"
                   type="text" 
@@ -132,12 +171,16 @@ const submitReview = async () => {
                 />
                 <textarea 
                   v-model="form.review"
-                  placeholder="Ваш отзыв" 
+                  placeholder="Ваш отзыв *" 
                   class="modal-textarea"
+                  :class="{ 'modal-input--error': modalErrors.review }"
                   rows="4"
-                  required
+                  maxlength="500"
                 ></textarea>
-                <button type="submit" class="modal-submit">Отправить</button>
+                <p v-if="modalErrors.review" class="modal-field-error">{{ modalErrors.review }}</p>
+                <div class="char-counter">{{ (form.value.review || '').length }}/500</div>
+                <p v-if="submitError" class="modal-error">{{ submitError }}</p>
+                <button type="submit" class="modal-submit" :disabled="submitting">{{ submitting ? 'Отправка...' : 'Отправить' }}</button>
               </form>
             </div>
           </div>
@@ -155,9 +198,15 @@ const submitReview = async () => {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 32px 16px 48px;
   border-radius: 40px;
   animation: heroFadeIn 0.8s ease-out;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 32px 24px 80px;
+  }
 }
 
 .hero-grid {
@@ -184,7 +233,7 @@ const submitReview = async () => {
 
 .hero-title {
   color: #004524;
-  font-size: 72px;
+  font-size: 36px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.1;
@@ -311,10 +360,16 @@ const submitReview = async () => {
 
 .cta-title {
   color: white;
-  font-size: 48px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .cta-title {
+    font-size: 48px;
+  }
 }
 
 .cta-description {
@@ -432,5 +487,93 @@ const submitReview = async () => {
 
 .modal-submit:hover {
   background-color: #3a7d3d;
+}
+
+.modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-error {
+  color: #ff6b6b;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  text-align: center;
+}
+
+.modal-input--error {
+  border-color: #ff6b6b !important;
+  color: #ff6b6b;
+}
+
+.modal-field-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  margin-top: -8px;
+}
+
+.char-counter {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  text-align: right;
+  margin-top: -8px;
+}
+
+.spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(68, 148, 74, 0.2);
+  border-top-color: #44944A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-block {
+  text-align: center;
+  padding: 48px;
+  color: #004524;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.error-block p {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.retry-btn {
+  padding: 10px 24px;
+  background: #44944A;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3a7d3d;
+}
+
+.empty-block {
+  text-align: center;
+  padding: 48px;
+  color: #004524;
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  opacity: 0.7;
 }
 </style>

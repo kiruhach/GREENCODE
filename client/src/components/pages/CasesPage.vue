@@ -4,18 +4,26 @@ import { casesService } from '@/lib/casesService'
 import { resolveCaseImage } from '@/lib/casesService';
 import casesBg from '@/assets/images/cases.webp?url';
 
-const filters = [
-  { id: 'all', label: 'Все кейсы' },
-  { id: 'development', label: 'Разработка сайтов' },
-  { id: 'seo', label: 'SEO-продвижение' },
-  { id: 'design', label: 'Веб-дизайн и UI/UX' },
-  { id: 'content', label: 'Контент-маркетинг' },
-  { id: 'analytics', label: 'Веб-аналитика' }
-]
+const categoryLabels = {
+  development: 'Разработка сайтов',
+  seo: 'SEO-продвижение',
+  design: 'Веб-дизайн и UI/UX',
+  content: 'Контент-маркетинг',
+  analytics: 'Веб-аналитика'
+}
 
 const activeFilter = ref('all')
 const cases = ref([])
 const loading = ref(true)
+const error = ref('')
+
+const filters = computed(() => {
+  const cats = [...new Set(cases.value.map(c => c.category).filter(Boolean))]
+  return [
+    { id: 'all', label: 'Все кейсы' },
+    ...cats.map(c => ({ id: c, label: categoryLabels[c] || c }))
+  ]
+})
 
 onMounted(async () => {
   await fetchCases()
@@ -49,10 +57,11 @@ function observeCases() {
 
 async function fetchCases() {
   loading.value = true
+  error.value = ''
   try {
     cases.value = await casesService.getAll()
-  } catch (e) {
-    console.error('Error fetching cases:', e)
+  } catch {
+    error.value = 'Не удалось загрузить кейсы'
   }
   loading.value = false
 }
@@ -111,7 +120,13 @@ watch(filteredCases, () => {
 
     <!-- Cases Grid -->
     <section class="cases-section">
-      <div v-if="loading" class="loading">Загрузка...</div>
+      <div v-if="loading" class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="error" class="error-block">
+        <p>{{ error }}</p>
+        <button class="retry-btn" @click="fetchCases">Повторить</button>
+      </div>
       <div v-else-if="filteredCases.length === 0" class="empty">
         Кейсы не найдены
       </div>
@@ -157,17 +172,18 @@ watch(filteredCases, () => {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 48px;
+  padding: 32px 16px 48px;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-  min-height: 800px;
+  min-height: auto;
   border-radius: 40px;
   animation: heroFadeIn 0.8s ease-out;
 }
 
 @media (min-width: 768px) {
   .hero-section {
+    padding: 32px 24px 48px;
     min-height: 900px;
   }
 }
@@ -219,16 +235,25 @@ watch(filteredCases, () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 261px;
-  height: 65px;
+  width: 100%;
+  max-width: 280px;
+  height: 56px;
   background-color: #44944A;
   box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
   border-radius: 20px;
   color: white;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   text-decoration: none;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .cta-button {
+    width: 261px;
+    height: 65px;
+    font-size: 20px;
+  }
 }
 
 .cta-button:hover {
@@ -415,6 +440,53 @@ watch(filteredCases, () => {
   color: rgba(255, 255, 255, 0.8);
   font-size: 12px;
   font-family: 'Roboto Mono', monospace;
+}
+
+.spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(68, 148, 74, 0.2);
+  border-top-color: #44944A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-block {
+  text-align: center;
+  padding: 48px;
+  color: #004524;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.error-block p {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.retry-btn {
+  padding: 10px 24px;
+  background: #44944A;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3a7d3d;
 }
 
 .loading,

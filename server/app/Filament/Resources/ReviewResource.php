@@ -10,8 +10,10 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
 
 class ReviewResource extends Resource
 {
@@ -31,6 +33,11 @@ class ReviewResource extends Resource
                 TextInput::make('role')->label('Должность'),
                 TextInput::make('initials')->label('Инициалы'),
                 Textarea::make('text')->label('Текст отзыва')->required(),
+                Select::make('status')->label('Статус')->options([
+                    'pending' => 'На модерации',
+                    'approved' => 'Одобрен',
+                    'rejected' => 'Отклонён',
+                ])->required(),
             ]);
     }
 
@@ -41,9 +48,28 @@ class ReviewResource extends Resource
                 TextColumn::make('name')->label('Имя')->searchable()->sortable(),
                 TextColumn::make('role')->label('Должность'),
                 TextColumn::make('text')->label('Отзыв')->limit(80),
+                BadgeColumn::make('status')->label('Статус')
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'approved',
+                        'danger' => 'rejected',
+                    ])
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'pending' => 'На модерации',
+                        'approved' => 'Одобрен',
+                        'rejected' => 'Отклонён',
+                        default => $state,
+                    }),
                 TextColumn::make('created_at')->label('Дата')->dateTime(),
             ])
-            ->filters([])
+            ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('status')->options([
+                    'pending' => 'На модерации',
+                    'approved' => 'Одобрен',
+                    'rejected' => 'Отклонён',
+                ]),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

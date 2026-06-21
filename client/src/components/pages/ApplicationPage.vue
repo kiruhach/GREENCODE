@@ -61,6 +61,7 @@ const formatPhone = (e) => {
 const loading = ref(false)
 const success = ref(false)
 const error = ref('')
+const fieldErrors = ref({})
 
 const toggleService = (service) => {
   const index = selectedServices.value.indexOf(service)
@@ -71,14 +72,25 @@ const toggleService = (service) => {
   }
 }
 
+function validate() {
+  const errs = {}
+  if (!name.value.trim()) errs.name = 'Укажите ваше имя'
+  if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
+  if (phone.value && !/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
+  fieldErrors.value = errs
+  return Object.keys(errs).length === 0
+}
+
+function fieldClass(field) {
+  return { 'form-input--error': fieldErrors.value[field] }
+}
+
 async function submitForm() {
-  if (!name.value.trim()) {
-    error.value = 'Укажите ваше имя'
-    return
-  }
+  if (!validate()) return
 
   loading.value = true
   error.value = ''
+  fieldErrors.value = {}
 
   try {
     await applicationsService.create({
@@ -174,17 +186,20 @@ async function submitForm() {
           <!-- Name & Email -->
           <div class="form-fields">
             <div class="form-field">
-              <input v-model="name" type="text" placeholder="Имя *" class="form-input" />
+              <input v-model="name" type="text" placeholder="Имя *" class="form-input" :class="fieldClass('name')" />
+              <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
             </div>
             <div class="form-field">
-              <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" />
+              <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" :class="fieldClass('email')" />
+              <p v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</p>
             </div>
           </div>
 
           <!-- Phone & Company -->
           <div class="form-fields">
             <div class="form-field">
-              <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" maxlength="18" />
+              <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" :class="fieldClass('phone')" maxlength="18" />
+              <p v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone }}</p>
             </div>
             <div class="form-field">
               <input v-model="company" type="text" placeholder="Компания" class="form-input" />
@@ -219,12 +234,14 @@ async function submitForm() {
 
           <!-- Task Result -->
           <div class="form-field form-textarea-field">
-            <textarea v-model="message" placeholder="Какой результат нужен: больше заявок, запуск нового продукта, рост органики, переупаковка бренда" class="form-input form-textarea"></textarea>
+            <textarea v-model="message" placeholder="Какой результат нужен: больше заявок, запуск нового продукта, рост органики, переупаковка бренда" class="form-input form-textarea" maxlength="1000"></textarea>
+            <div class="char-counter">{{ (message || '').length }}/1000</div>
           </div>
 
           <!-- Task Details -->
           <div class="form-field form-textarea-field-lg">
-            <textarea v-model="taskDetails" placeholder="Опишите задачу подробнее: текущая ситуация, ограничения, дедлайны, ожидания." class="form-input form-textarea"></textarea>
+            <textarea v-model="taskDetails" placeholder="Опишите задачу подробнее: текущая ситуация, ограничения, дедлайны, ожидания." class="form-input form-textarea" maxlength="2000"></textarea>
+            <div class="char-counter">{{ (taskDetails || '').length }}/2000</div>
           </div>
 
           <!-- Parameters Section -->
@@ -287,9 +304,15 @@ async function submitForm() {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px 16px 48px;
   border-radius: 40px;
   animation: heroFadeIn 0.8s ease-out;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 32px 24px 64px;
+  }
 }
 
 .hero-grid {
@@ -309,7 +332,7 @@ async function submitForm() {
 
 .hero-title {
   color: #004524;
-  font-size: 48px;
+  font-size: 32px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.1;
@@ -368,15 +391,16 @@ async function submitForm() {
 
 .card-title {
   color: white;
-  font-size: 32px;
+  font-size: 24px;
   font-family: 'Roboto Mono', monospace;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.25;
 }
 
 @media (min-width: 768px) {
   .card-title {
     font-size: 40px;
+    margin-bottom: 16px;
   }
 }
 
@@ -391,8 +415,14 @@ async function submitForm() {
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 36px;
-  padding: 40px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+@media (min-width: 768px) {
+  .form-card {
+    padding: 40px;
+  }
 }
 
 .form-header {
@@ -419,16 +449,17 @@ async function submitForm() {
 
 .form-title {
   color: white;
-  font-size: 48px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.15;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
   .form-title {
     font-size: 68px;
+    margin-bottom: 32px;
   }
 }
 
@@ -465,8 +496,14 @@ async function submitForm() {
 .form-field {
   background-color: rgba(255, 255, 255, 0.04);
   border-radius: 22px;
-  padding: 20px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 768px) {
+  .form-field {
+    padding: 20px;
+  }
 }
 
 .form-input {
@@ -477,6 +514,25 @@ async function submitForm() {
   font-family: 'Roboto Mono', monospace;
   border: none;
   outline: none;
+}
+
+.form-input--error {
+  color: #ff6b6b;
+}
+
+.field-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  margin-top: 8px;
+}
+
+.char-counter {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  text-align: right;
+  margin-top: 6px;
 }
 
 .form-input::placeholder {
@@ -518,7 +574,7 @@ async function submitForm() {
 
 .service-tags {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -606,18 +662,26 @@ async function submitForm() {
 }
 
 .submit-button {
-  width: 265px;
-  height: 78px;
+  width: 100%;
+  height: 60px;
   background-color: #44944A;
   box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
   border-radius: 24px;
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   font-family: 'Roboto Mono', monospace;
   font-weight: 500;
   border: none;
   cursor: pointer;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .submit-button {
+    width: 265px;
+    height: 78px;
+    font-size: 20px;
+  }
 }
 
 .submit-button:hover {

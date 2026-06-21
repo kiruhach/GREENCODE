@@ -11,12 +11,15 @@ onMounted(async () => {
   await fetchCase()
 })
 
+const error = ref('')
+
 async function fetchCase() {
   loading.value = true
+  error.value = ''
   try {
     currentCase.value = await casesService.getById(route.params.id)
-  } catch (e) {
-    console.error('Error fetching case:', e)
+  } catch {
+    error.value = 'Не удалось загрузить кейс'
   }
   loading.value = false
 }
@@ -95,8 +98,13 @@ const categoryLabel = computed(() => {
     </section>
   </div>
 
-  <div v-else-if="loading" class="loading">
-    Загрузка...
+  <div v-else-if="loading" class="spinner-wrapper">
+    <div class="spinner"></div>
+  </div>
+
+  <div v-else-if="error" class="error-block">
+    <p>{{ error }}</p>
+    <button class="retry-btn" @click="fetchCase">Повторить</button>
   </div>
 
   <div v-else class="not-found">
@@ -113,7 +121,7 @@ const categoryLabel = computed(() => {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 32px 16px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 32px;
@@ -121,6 +129,7 @@ const categoryLabel = computed(() => {
 
 @media (min-width: 1024px) {
   .hero-section {
+    padding: 32px 24px;
     grid-template-columns: 1fr 1fr;
     align-items: center;
   }
@@ -147,7 +156,7 @@ const categoryLabel = computed(() => {
 
 .case-title {
   color: #004524;
-  font-size: 42px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.2;
@@ -193,15 +202,27 @@ const categoryLabel = computed(() => {
 .case-detail-image {
   width: 100%;
   max-width: 800px;
-  height: 500px;
+  height: 250px;
   object-fit: cover;
   border-radius: 32px;
+}
+
+@media (min-width: 768px) {
+  .case-detail-image {
+    height: 500px;
+  }
 }
 
 .tags-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 0 24px 40px;
+  padding: 0 16px 24px;
+}
+
+@media (min-width: 768px) {
+  .tags-section {
+    padding: 0 24px 40px;
+  }
 }
 
 .tags-grid {
@@ -223,17 +244,30 @@ const categoryLabel = computed(() => {
 .content-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 24px 16px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .content-section {
+    padding: 40px 24px;
+    gap: 40px;
+  }
 }
 
 .content-block {
   background-color: #004524;
   border-radius: 32px;
-  padding: 40px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+@media (min-width: 768px) {
+  .content-block {
+    padding: 40px;
+  }
 }
 
 .results-block {
@@ -285,32 +319,54 @@ const categoryLabel = computed(() => {
 .cta-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 80px 24px;
+  padding: 48px 16px;
   text-align: center;
+}
+
+@media (min-width: 768px) {
+  .cta-section {
+    padding: 80px 24px;
+  }
 }
 
 .cta-title {
   color: #004524;
-  font-size: 48px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .cta-title {
+    font-size: 48px;
+    margin-bottom: 32px;
+  }
 }
 
 .cta-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 280px;
-  height: 65px;
+  width: 100%;
+  max-width: 280px;
+  height: 56px;
   background-color: #44944A;
   box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
   border-radius: 20px;
   color: white;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   text-decoration: none;
   transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+  .cta-button {
+    width: 280px;
+    height: 65px;
+    font-size: 20px;
+  }
 }
 
 .cta-button:hover {
@@ -318,13 +374,54 @@ const categoryLabel = computed(() => {
   transform: scale(1.02);
 }
 
-.loading {
+.spinner-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 100px 24px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(68, 148, 74, 0.2);
+  border-top-color: #44944A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-block {
   flex: 1;
   text-align: center;
   padding: 100px 24px;
   color: #004524;
-  font-size: 24px;
   font-family: 'Roboto Mono', monospace;
+}
+
+.error-block p {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.retry-btn {
+  padding: 12px 28px;
+  background: #44944A;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3a7d3d;
 }
 
 .not-found {

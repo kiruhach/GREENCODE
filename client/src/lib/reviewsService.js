@@ -20,14 +20,4 @@ export const reviewsService = {
     const response = await api.post('reviews', review)
     return response.data
   },
-
-  async update(id, review) {
-    const response = await api.put(`reviews/${id}`, review)
-    return response.data
-  },
-
-  async remove(id) {
-    await api.delete(`reviews/${id}`)
-    return true
-  },
 }

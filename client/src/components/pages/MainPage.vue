@@ -58,11 +58,18 @@ function observeCases() {
 
 const cases = ref([])
 const loadingCases = ref(true)
+const casesError = ref('')
 
 async function fetchCases() {
-  const data = await casesService.getAll()
-  if (data) {
-    cases.value = data.slice(0, 3)
+  loadingCases.value = true
+  casesError.value = ''
+  try {
+    const data = await casesService.getAll()
+    if (data) {
+      cases.value = data.slice(0, 3)
+    }
+  } catch {
+    casesError.value = 'Не удалось загрузить кейсы'
   }
   loadingCases.value = false
 }
@@ -130,12 +137,21 @@ const formatPhone = (e) => {
 }
 
 const reviews = ref([])
+const loadingReviews = ref(true)
+const reviewsError = ref('')
 
 async function fetchReviews() {
-  const data = await reviewsService.getLatest(2)
-  if (data) {
-    reviews.value = data
+  loadingReviews.value = true
+  reviewsError.value = ''
+  try {
+    const data = await reviewsService.getLatest(2)
+    if (data) {
+      reviews.value = data
+    }
+  } catch {
+    reviewsError.value = 'Не удалось загрузить отзывы'
   }
+  loadingReviews.value = false
 }
 
 const name = ref('')
@@ -143,15 +159,27 @@ const message = ref('')
 const loading = ref(false)
 const success = ref(false)
 const error = ref('')
+const fieldErrors = ref({})
+
+function validateForm() {
+  const errs = {}
+  if (!name.value.trim()) errs.name = 'Укажите ваше имя'
+  if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
+  if (phone.value && !/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
+  fieldErrors.value = errs
+  return Object.keys(errs).length === 0
+}
+
+function fieldClass(field) {
+  return { 'form-input--error': fieldErrors.value[field] }
+}
 
 async function submitForm() {
-  if (!name.value.trim()) {
-    error.value = 'Укажите ваше имя'
-    return
-  }
+  if (!validateForm()) return
 
   loading.value = true
   error.value = ''
+  fieldErrors.value = {}
 
   try {
     await applicationsService.create({
@@ -269,6 +297,17 @@ async function submitForm() {
       </div>
       <h2 class="section-title">Кейсы</h2>
 
+      <div v-if="loadingCases" class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="casesError" class="error-block">
+        <p>{{ casesError }}</p>
+        <button class="retry-btn" @click="fetchCases">Повторить</button>
+      </div>
+      <template v-else-if="cases.length === 0">
+        <div class="empty-block">Кейсы пока не добавлены</div>
+      </template>
+      <template v-else>
       <!-- Cases Grid -->
       <div class="cases-grid">
         <router-link 
@@ -290,7 +329,7 @@ async function submitForm() {
           </div>
         </router-link>
       </div>
-
+      </template>
       <!-- View All Button -->
       <div class="view-all-wrapper">
         <router-link 
@@ -309,6 +348,15 @@ async function submitForm() {
       </div>
       <h2 class="section-title">Отзывы клиентов</h2>
 
+      <div v-if="loadingReviews" class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="reviewsError" class="error-block">
+        <p>{{ reviewsError }}</p>
+        <button class="retry-btn" @click="fetchReviews">Повторить</button>
+      </div>
+      <div v-else-if="reviews.length === 0" class="empty-block">Отзывов пока нет</div>
+      <template v-else>
       <!-- Reviews Grid -->
       <div class="reviews-grid">
         <div 
@@ -331,9 +379,10 @@ async function submitForm() {
           </div>
         </div>
       </div>
+      </template>
 
       <!-- View All Button -->
-      <div class="view-all-wrapper">
+      <div v-if="!loadingReviews && !reviewsError && reviews.length > 0" class="view-all-wrapper">
         <router-link to="/reviews" class="view-all-button">
           Открыть отзывы
         </router-link>
@@ -381,16 +430,19 @@ async function submitForm() {
               <!-- Form Fields -->
               <div class="form-fields">
                 <div class="form-field">
-                  <input v-model="name" type="text" placeholder="Имя" class="form-input" />
+                  <input v-model="name" type="text" placeholder="Имя *" class="form-input" :class="fieldClass('name')" />
+                  <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
                 </div>
                 <div class="form-field">
-                  <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" />
+                  <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" :class="fieldClass('email')" />
+                  <p v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</p>
                 </div>
               </div>
 
               <!-- Phone -->
               <div class="form-field">
-                <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" maxlength="18" />
+                <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" :class="fieldClass('phone')" maxlength="18" />
+                <p v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone }}</p>
               </div>
 
               <!-- Message -->
@@ -398,7 +450,8 @@ async function submitForm() {
                 <h3 class="form-section-title">Сообщение</h3>
                 <div class="form-divider mb-4"></div>
                 <div class="form-field">
-                  <textarea v-model="message" placeholder="Сообщение" class="form-input form-textarea"></textarea>
+                  <textarea v-model="message" placeholder="Сообщение" class="form-input form-textarea" maxlength="1000"></textarea>
+                  <div class="char-counter">{{ (message || '').length }}/1000</div>
                 </div>
               </div>
 
@@ -449,11 +502,17 @@ spline-viewer {
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 0 120px 24px;
+  padding: 32px 16px 80px;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   border-radius: 40px;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 32px 0 120px 24px;
+  }
 }
 
 .hero-grid {
@@ -1108,8 +1167,27 @@ spline-viewer {
   outline: none;
 }
 
+.form-input--error {
+  color: #ff6b6b;
+}
+
 .form-input::placeholder {
   color: rgba(255, 255, 255, 0.44);
+}
+
+.field-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  margin-top: 8px;
+}
+
+.char-counter {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  text-align: right;
+  margin-top: 6px;
 }
 
 .form-textarea {
@@ -1201,5 +1279,61 @@ spline-viewer {
   .form-title {
     margin-right: 535px;
   }
+}
+
+.spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(68, 148, 74, 0.2);
+  border-top-color: #44944A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-block {
+  text-align: center;
+  padding: 32px;
+  color: #004524;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.error-block p {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.retry-btn {
+  padding: 10px 24px;
+  background: #44944A;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3a7d3d;
+}
+
+.empty-block {
+  text-align: center;
+  padding: 32px;
+  color: #004524;
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  opacity: 0.7;
 }
 </style>

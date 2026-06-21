@@ -1,5 +1,26 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import aboutBg from '@/assets/images/about.webp?url';
+
+const sections = ref([])
+let observer = null
+
+onMounted(() => {
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('section-visible')
+        observer.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.15 })
+
+  document.querySelectorAll('.animate-section').forEach(el => observer.observe(el))
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
+})
 
 const mainCards = [
   {
@@ -67,7 +88,7 @@ const reasons = [
     </section>
 
     <!-- Three Main Cards -->
-    <section class="cards-section">
+    <section class="cards-section animate-section">
       <div class="cards-grid">
         <div 
           v-for="(card, index) in mainCards" 
@@ -82,7 +103,7 @@ const reasons = [
     </section>
 
     <!-- Values Section -->
-    <section class="values-section">
+    <section class="values-section animate-section">
       <div class="values-card">
         <span class="section-label-light">/ values</span>
         <h2 class="values-title">На чём держится наша работа</h2>
@@ -101,7 +122,7 @@ const reasons = [
     </section>
 
     <!-- Numbers Section -->
-    <section class="numbers-section">
+    <section class="numbers-section animate-section">
       <div class="numbers-grid">
         <!-- Numbers -->
         <div class="numbers-card">
@@ -140,7 +161,7 @@ const reasons = [
     </section>
 
     <!-- Why Clients Stay -->
-    <section class="reasons-section">
+    <section class="reasons-section animate-section">
       <div class="reasons-card">
         <span class="section-label-light">/ why clients stay</span>
         <h3 class="reasons-title">Почему с нами остаются надолго</h3>
@@ -162,12 +183,18 @@ const reasons = [
 .hero-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px 16px 48px;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   border-radius: 40px;
   animation: heroFadeIn 0.8s ease-out;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 32px 24px 64px;
+  }
 }
 
 .hero-grid {
@@ -202,11 +229,24 @@ const reasons = [
 
 .hero-title {
   color: #004524;
-  font-size: 32px;
+  font-size: 24px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.1;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 72px;
+    margin-bottom: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 104px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -290,7 +330,13 @@ const reasons = [
 .cards-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 24px 16px;
+}
+
+@media (min-width: 768px) {
+  .cards-section {
+    padding: 40px 24px;
+  }
 }
 
 .cards-grid {
@@ -309,8 +355,14 @@ const reasons = [
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 32px;
-  padding: 32px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+@media (min-width: 768px) {
+  .main-card {
+    padding: 32px;
+  }
 }
 
 .card-label {
@@ -323,15 +375,16 @@ const reasons = [
 
 .card-title {
   color: white;
-  font-size: 36px;
+  font-size: 24px;
   font-family: 'Roboto Mono', monospace;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.25;
 }
 
 @media (min-width: 768px) {
   .card-title {
     font-size: 42px;
+    margin-bottom: 16px;
   }
 }
 
@@ -345,29 +398,54 @@ const reasons = [
 .values-section {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 24px 16px;
+}
+
+.numbers-section {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.reasons-section {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+@media (min-width: 768px) {
+  .values-section { padding: 40px 24px; }
+  .numbers-section { padding: 40px 24px; }
+  .reasons-section { padding: 40px 24px 80px; }
 }
 
 .values-card {
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 36px;
-  padding: 40px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+@media (min-width: 768px) {
+  .values-card {
+    padding: 40px;
+  }
 }
 
 .values-title {
   color: white;
-  font-size: 48px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.15;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
   .values-title {
     font-size: 68px;
+    margin-bottom: 40px;
   }
 }
 
@@ -432,8 +510,30 @@ const reasons = [
   background-color: #004524;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
   border-radius: 36px;
-  padding: 32px;
+  padding: 24px;
   border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+.workflow-card {
+  background-color: #004524;
+  box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
+  border-radius: 36px;
+  padding: 24px;
+  border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+.reasons-card {
+  background-color: #004524;
+  box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.03) inset, 0px 0px 34px rgba(0, 255, 102, 0.10);
+  border-radius: 36px;
+  padding: 24px;
+  border: 1px solid rgba(68, 148, 74, 0.2);
+}
+
+@media (min-width: 768px) {
+  .numbers-card { padding: 32px; }
+  .workflow-card { padding: 32px; }
+  .reasons-card { padding: 32px; }
 }
 
 .numbers-list {
@@ -479,16 +579,17 @@ const reasons = [
 
 .workflow-title {
   color: white;
-  font-size: 48px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.15;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
   .workflow-title {
     font-size: 62px;
+    margin-bottom: 32px;
   }
 }
 
@@ -536,16 +637,17 @@ const reasons = [
 
 .reasons-title {
   color: white;
-  font-size: 48px;
+  font-size: 28px;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   line-height: 1.15;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
   .reasons-title {
     font-size: 62px;
+    margin-bottom: 32px;
   }
 }
 
@@ -567,5 +669,16 @@ const reasons = [
   font-size: 20px;
   font-family: 'Roboto Mono', monospace;
   line-height: 2.25;
+}
+
+.animate-section {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.animate-section.section-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Review extends Model
 {
     protected $fillable = [
-        'name', 'role', 'text', 'initials'
+        'name', 'role', 'text', 'initials', 'status'
+    ];
+
+    protected $casts = [
+        'status' => 'string',
     ];
 }
