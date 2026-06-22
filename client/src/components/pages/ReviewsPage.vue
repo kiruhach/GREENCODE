@@ -159,6 +159,7 @@ const submitReview = async () => {
                   v-model="form.name"
                   type="text" 
                   placeholder="Ваше имя *" 
+                  maxlength="30"
                   class="modal-input"
                   :class="{ 'modal-input--error': modalErrors.name }"
                 />

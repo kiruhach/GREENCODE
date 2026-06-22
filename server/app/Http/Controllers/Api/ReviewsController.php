@@ -37,7 +37,7 @@ class ReviewsController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:30',
             'role' => 'nullable|string|max:255',
             'text' => 'required|string',
             'initials' => 'nullable|string|max:10',

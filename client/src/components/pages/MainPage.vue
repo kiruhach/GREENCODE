@@ -461,6 +461,7 @@ async function submitForm() {
               v-model="reviewForm.name"
               type="text" 
               placeholder="Ваше имя *" 
+              maxlength="30"
               class="review-modal-input"
               :class="{ 'review-modal-input--error': reviewModalErrors.name }"
             />
@@ -529,7 +530,7 @@ async function submitForm() {
               <!-- Form Fields -->
               <div class="form-fields">
                 <div class="form-field">
-                  <input v-model="name" type="text" placeholder="Имя *" class="form-input" :class="fieldClass('name')" />
+                  <input v-model="name" type="text" placeholder="Имя *" maxlength="30" class="form-input" :class="fieldClass('name')" />
                   <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
                 </div>
                 <div class="form-field">

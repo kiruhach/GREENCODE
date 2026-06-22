@@ -199,7 +199,7 @@ async function submitForm() {
           <!-- Name & Email -->
           <div class="form-fields">
             <div class="form-field">
-              <input v-model="name" type="text" placeholder="Имя *" class="form-input" :class="fieldClass('name')" />
+              <input v-model="name" type="text" placeholder="Имя *" maxlength="30" class="form-input" :class="fieldClass('name')" />
               <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
             </div>
             <div class="form-field">
