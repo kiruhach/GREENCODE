@@ -121,8 +121,17 @@ async function submitForm() {
     timeframe.value = ''
     contactFormat.value = ''
     selectedServices.value = []
-  } catch {
-    error.value = 'Ошибка при отправке. Попробуйте ещё раз.'
+  } catch (err) {
+    if (err.response?.status === 422 && err.response.data?.errors) {
+      const serverErrors = err.response.data.errors
+      const mapped = {}
+      for (const field of Object.keys(serverErrors)) {
+        mapped[field] = serverErrors[field][0]
+      }
+      fieldErrors.value = mapped
+    } else {
+      error.value = 'Ошибка при отправке. Попробуйте ещё раз.'
+    }
   }
   loading.value = false
 }
