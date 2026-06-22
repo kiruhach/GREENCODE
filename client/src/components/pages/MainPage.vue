@@ -161,6 +161,53 @@ const success = ref(false)
 const error = ref('')
 const fieldErrors = ref({})
 
+const showReviewModal = ref(false)
+const reviewForm = ref({ name: '', role: '', review: '' })
+const submittingReview = ref(false)
+const reviewSubmitError = ref('')
+const reviewModalErrors = ref({})
+
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+  return parts[0].slice(0, 2).toUpperCase()
+}
+
+function validateReviewModal() {
+  const errs = {}
+  if (!reviewForm.value.name.trim()) errs.name = 'Укажите ваше имя'
+  if (!reviewForm.value.review.trim()) errs.review = 'Напишите отзыв'
+  reviewModalErrors.value = errs
+  return Object.keys(errs).length === 0
+}
+
+const submitReview = async () => {
+  if (!validateReviewModal()) return
+
+  reviewSubmitError.value = ''
+  reviewModalErrors.value = {}
+  submittingReview.value = true
+  try {
+    const review = {
+      name: reviewForm.value.name,
+      role: reviewForm.value.role || '',
+      text: reviewForm.value.review,
+      initials: getInitials(reviewForm.value.name)
+    }
+    const data = await reviewsService.create(review)
+    if (data) {
+      reviews.value.unshift(data)
+    }
+    reviewForm.value = { name: '', role: '', review: '' }
+    showReviewModal.value = false
+  } catch {
+    reviewSubmitError.value = 'Ошибка при отправке. Попробуйте ещё раз.'
+  }
+  submittingReview.value = false
+}
+
 function validateForm() {
   const errs = {}
   if (!name.value.trim()) errs.name = 'Укажите ваше имя'
@@ -394,11 +441,52 @@ async function submitForm() {
 
       <!-- View All Button -->
       <div v-if="!loadingReviews && !reviewsError" class="view-all-wrapper">
-        <router-link to="/reviews" class="view-all-button">
-          {{ reviews.length > 0 ? 'Все отзывы' : 'Оставить отзыв' }}
+        <router-link v-if="reviews.length > 0" to="/reviews" class="view-all-button">
+          Все отзывы
         </router-link>
+        <button v-else @click="showReviewModal = true" class="view-all-button">
+          Оставить отзыв
+        </button>
       </div>
     </section>
+
+    <!-- Review Modal -->
+    <Teleport to="body">
+      <div v-if="showReviewModal" class="review-modal-overlay" @click.self="showReviewModal = false">
+        <div class="review-modal-content">
+          <button class="review-modal-close" @click="showReviewModal = false">×</button>
+          <h3 class="review-modal-title">Оставить отзыв</h3>
+          <form @submit.prevent="submitReview" class="review-modal-form">
+            <input 
+              v-model="reviewForm.name"
+              type="text" 
+              placeholder="Ваше имя *" 
+              class="review-modal-input"
+              :class="{ 'review-modal-input--error': reviewModalErrors.name }"
+            />
+            <p v-if="reviewModalErrors.name" class="review-modal-field-error">{{ reviewModalErrors.name }}</p>
+            <input 
+              v-model="reviewForm.role"
+              type="text" 
+              placeholder="Ваша должность (необязательно)" 
+              class="review-modal-input"
+            />
+            <textarea 
+              v-model="reviewForm.review"
+              placeholder="Ваш отзыв *" 
+              class="review-modal-textarea"
+              :class="{ 'review-modal-input--error': reviewModalErrors.review }"
+              rows="4"
+              maxlength="500"
+            ></textarea>
+            <p v-if="reviewModalErrors.review" class="review-modal-field-error">{{ reviewModalErrors.review }}</p>
+            <div class="review-modal-counter">{{ (reviewForm.review || '').length }}/500</div>
+            <p v-if="reviewSubmitError" class="review-modal-error">{{ reviewSubmitError }}</p>
+            <button type="submit" class="review-modal-submit" :disabled="submittingReview">{{ submittingReview ? 'Отправка...' : 'Отправить' }}</button>
+          </form>
+        </div>
+      </div>
+    </Teleport>
 
     <!-- Contacts & Form Section -->
     <section class="contacts-section">
@@ -1346,5 +1434,142 @@ spline-viewer {
   font-size: 16px;
   font-family: 'Roboto Mono', monospace;
   opacity: 0.7;
+}
+
+.view-all-button {
+  border: none;
+  cursor: pointer;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .view-all-button {
+    font-size: 20px;
+  }
+}
+
+.review-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.review-modal-content {
+  background: #004524;
+  border-radius: 36px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  border: 1px solid rgba(68, 148, 74, 0.2);
+  position: relative;
+}
+
+.review-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 28px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.review-modal-title {
+  color: white;
+  font-size: 28px;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.review-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-modal-input {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.review-modal-input--error {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.review-modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.review-modal-textarea {
+  resize: none;
+  min-height: 120px;
+}
+
+.review-modal-field-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  margin: -8px 0 0;
+}
+
+.review-modal-counter {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  text-align: right;
+  margin-top: -8px;
+}
+
+.review-modal-error {
+  color: #ff6b6b;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  margin: 0;
+}
+
+.review-modal-submit {
+  width: 100%;
+  height: 56px;
+  background-color: #44944A;
+  box-shadow: 0px 0px 36px rgba(0, 255, 102, 0.24);
+  border-radius: 20px;
+  color: white;
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.review-modal-submit:hover {
+  background-color: #3a7d3d;
+  transform: scale(1.02);
+}
+
+.review-modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 </style>
