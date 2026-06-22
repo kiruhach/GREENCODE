@@ -19,8 +19,8 @@ class ApplicationsController extends Controller
             'task_details' => 'nullable|string',
             'timeframe' => 'nullable|string',
             'budget' => 'nullable|string',
-            'contact_format' => 'required|string',
-            'services' => 'required|array|min:1',
+            'contact_format' => 'nullable|string',
+            'services' => 'nullable|array',
         ]);
 
         $data['status'] = 'new';
