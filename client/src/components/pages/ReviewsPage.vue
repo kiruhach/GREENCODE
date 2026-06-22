@@ -37,6 +37,7 @@ function getInitials(name) {
 }
 
 const modalErrors = ref({})
+const reviewSubmitted = ref(false)
 
 function validateModal() {
   const errs = {}
@@ -59,12 +60,13 @@ const submitReview = async () => {
       text: form.value.review,
       initials: getInitials(form.value.name)
     }
-    const data = await reviewsService.create(review)
-    if (data) {
-      reviews.value.unshift(data)
-    }
+    await reviewsService.create(review)
     form.value = { name: '', role: '', review: '' }
-    showModal.value = false
+    reviewSubmitted.value = true
+    setTimeout(() => {
+      reviewSubmitted.value = false
+      showModal.value = false
+    }, 3000)
   } catch {
     submitError.value = 'Ошибка при отправке. Попробуйте ещё раз.'
   }
@@ -154,7 +156,7 @@ const submitReview = async () => {
             <div class="modal-content">
               <button class="modal-close" @click="showModal = false">×</button>
               <h3 class="modal-title">Оставить отзыв</h3>
-              <form @submit.prevent="submitReview" class="modal-form">
+              <form v-if="!reviewSubmitted" @submit.prevent="submitReview" class="modal-form">
                 <input 
                   v-model="form.name"
                   type="text" 
@@ -183,6 +185,9 @@ const submitReview = async () => {
                 <p v-if="submitError" class="modal-error">{{ submitError }}</p>
                 <button type="submit" class="modal-submit" :disabled="submitting">{{ submitting ? 'Отправка...' : 'Отправить' }}</button>
               </form>
+              <div v-else class="modal-success">
+                <p class="modal-success-text">Отзыв отправлен на модерацию и появится после проверки.</p>
+              </div>
             </div>
           </div>
         </Teleport>
@@ -493,6 +498,19 @@ const submitReview = async () => {
 .modal-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+}
+
+.modal-success {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.modal-success-text {
+  color: #92FFAD;
+  font-size: 18px;
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.6;
 }
 
 .modal-error {

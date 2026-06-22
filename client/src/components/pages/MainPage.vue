@@ -183,6 +183,8 @@ function validateReviewModal() {
   return Object.keys(errs).length === 0
 }
 
+const reviewSubmitted = ref(false)
+
 const submitReview = async () => {
   if (!validateReviewModal()) return
 
@@ -196,12 +198,13 @@ const submitReview = async () => {
       text: reviewForm.value.review,
       initials: getInitials(reviewForm.value.name)
     }
-    const data = await reviewsService.create(review)
-    if (data) {
-      reviews.value.unshift(data)
-    }
+    await reviewsService.create(review)
     reviewForm.value = { name: '', role: '', review: '' }
-    showReviewModal.value = false
+    reviewSubmitted.value = true
+    setTimeout(() => {
+      reviewSubmitted.value = false
+      showReviewModal.value = false
+    }, 3000)
   } catch {
     reviewSubmitError.value = 'Ошибка при отправке. Попробуйте ещё раз.'
   }
@@ -456,7 +459,7 @@ async function submitForm() {
         <div class="review-modal-content">
           <button class="review-modal-close" @click="showReviewModal = false">×</button>
           <h3 class="review-modal-title">Оставить отзыв</h3>
-          <form @submit.prevent="submitReview" class="review-modal-form">
+          <form v-if="!reviewSubmitted" @submit.prevent="submitReview" class="review-modal-form">
             <input 
               v-model="reviewForm.name"
               type="text" 
@@ -485,6 +488,9 @@ async function submitForm() {
             <p v-if="reviewSubmitError" class="review-modal-error">{{ reviewSubmitError }}</p>
             <button type="submit" class="review-modal-submit" :disabled="submittingReview">{{ submittingReview ? 'Отправка...' : 'Отправить' }}</button>
           </form>
+          <div v-else class="review-modal-success">
+            <p class="review-modal-success-text">Отзыв отправлен на модерацию и появится после проверки.</p>
+          </div>
         </div>
       </div>
     </Teleport>
@@ -1572,5 +1578,17 @@ spline-viewer {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+.review-modal-success {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.review-modal-success-text {
+  color: #92FFAD;
+  font-size: 18px;
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.6;
 }
 </style>
