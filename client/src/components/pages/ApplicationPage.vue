@@ -75,8 +75,12 @@ const toggleService = (service) => {
 function validate() {
   const errs = {}
   if (!name.value.trim()) errs.name = 'Укажите ваше имя'
-  if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
-  if (phone.value && !/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
+  if (!email.value.trim()) errs.email = 'Укажите email'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
+  if (!phone.value.trim()) errs.phone = 'Укажите телефон'
+  else if (!/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
+  if (!contactFormat.value) errs.contactFormat = 'Выберите формат связи'
+  if (!selectedServices.value.length) errs.services = 'Выберите хотя бы одну услугу'
   fieldErrors.value = errs
   return Object.keys(errs).length === 0
 }
@@ -190,7 +194,7 @@ async function submitForm() {
               <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
             </div>
             <div class="form-field">
-              <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" :class="fieldClass('email')" />
+              <input :value="email" @input="handleEmailInput" type="email" placeholder="Email *" class="form-input" :class="fieldClass('email')" />
               <p v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</p>
             </div>
           </div>
@@ -198,7 +202,7 @@ async function submitForm() {
           <!-- Phone & Company -->
           <div class="form-fields">
             <div class="form-field">
-              <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" :class="fieldClass('phone')" maxlength="18" />
+              <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон *" class="form-input" :class="fieldClass('phone')" maxlength="18" />
               <p v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone }}</p>
             </div>
             <div class="form-field">
@@ -225,6 +229,7 @@ async function submitForm() {
               <span class="service-text">{{ service }}</span>
             </div>
           </div>
+          <p v-if="fieldErrors.services" class="field-error">{{ fieldErrors.services }}</p>
 
           <!-- Task Section -->
           <div class="form-section">
@@ -274,9 +279,10 @@ async function submitForm() {
           <!-- Contact Format -->
           <div class="form-field">
             <select v-model="contactFormat" class="form-input form-select">
-              <option value="" disabled>Предпочтительный формат связи</option>
+              <option value="" disabled>Предпочтительный формат связи *</option>
               <option v-for="cf in contactFormats" :key="cf" :value="cf">{{ cf }}</option>
             </select>
+            <p v-if="fieldErrors.contactFormat" class="field-error">{{ fieldErrors.contactFormat }}</p>
           </div>
 
           <!-- Submit -->

@@ -164,8 +164,10 @@ const fieldErrors = ref({})
 function validateForm() {
   const errs = {}
   if (!name.value.trim()) errs.name = 'Укажите ваше имя'
-  if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
-  if (phone.value && !/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
+  if (!email.value.trim()) errs.email = 'Укажите email'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) errs.email = 'Некорректный email'
+  if (!phone.value.trim()) errs.phone = 'Укажите телефон'
+  else if (!/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(phone.value)) errs.phone = 'Некорректный телефон'
   fieldErrors.value = errs
   return Object.keys(errs).length === 0
 }
@@ -434,14 +436,14 @@ async function submitForm() {
                   <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
                 </div>
                 <div class="form-field">
-                  <input :value="email" @input="handleEmailInput" type="email" placeholder="Email" class="form-input" :class="fieldClass('email')" />
+                  <input :value="email" @input="handleEmailInput" type="email" placeholder="Email *" class="form-input" :class="fieldClass('email')" />
                   <p v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</p>
                 </div>
               </div>
 
               <!-- Phone -->
               <div class="form-field">
-                <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон" class="form-input" :class="fieldClass('phone')" maxlength="18" />
+                <input :value="phone" @input="formatPhone" type="tel" placeholder="Телефон *" class="form-input" :class="fieldClass('phone')" maxlength="18" />
                 <p v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone }}</p>
               </div>
 

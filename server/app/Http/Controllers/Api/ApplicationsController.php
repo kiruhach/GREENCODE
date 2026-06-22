@@ -12,15 +12,15 @@ class ApplicationsController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string',
+            'email' => 'required|email',
+            'phone' => 'required|string',
             'company' => 'nullable|string',
             'message' => 'nullable|string',
             'task_details' => 'nullable|string',
             'timeframe' => 'nullable|string',
             'budget' => 'nullable|string',
-            'contact_format' => 'nullable|string',
-            'services' => 'nullable|array',
+            'contact_format' => 'required|string',
+            'services' => 'required|array|min:1',
         ]);
 
         $data['status'] = 'new';
