@@ -393,9 +393,9 @@ async function submitForm() {
       </template>
 
       <!-- View All Button -->
-      <div v-if="!loadingReviews && !reviewsError && reviews.length > 0" class="view-all-wrapper">
+      <div v-if="!loadingReviews && !reviewsError" class="view-all-wrapper">
         <router-link to="/reviews" class="view-all-button">
-          Открыть отзывы
+          {{ reviews.length > 0 ? 'Все отзывы' : 'Оставить отзыв' }}
         </router-link>
       </div>
     </section>
